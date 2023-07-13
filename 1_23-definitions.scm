@@ -4,16 +4,18 @@
 (define (square n) (* n n))
 
 (define (smallest-divisor n)
-  (find-divisor n 2))
+  (if (divides? 2 n)
+      2
+      (find-uneven-divisor n 3)))
 
-(define (find-divisor n test-divisor)
+(define (find-uneven-divisor n test-divisor)
   (cond ((> (square test-divisor) n)
          n)
         ((divides? test-divisor n)
          test-divisor)
-        (else (find-divisor
+        (else (find-uneven-divisor
                n
-               (+ test-divisor 1)))))
+               (+ test-divisor 2)))))
 
 (define (divides? a b)
   (= (remainder b a) 0))
@@ -33,3 +35,13 @@
   (display " | ")
   (display elapsed-time)
   (newline))
+
+(define (search-for-primes start)
+  (define (search-for-primes-iter n count)
+    (if (> count 0)
+        (search-for-primes-iter
+         (+ n 2)
+         (if (timed-prime-test n) (- count 1) count))))
+  (search-for-primes-iter
+   (if (divides? 2 start) (+ start 1) start)
+   3))

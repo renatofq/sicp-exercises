@@ -597,7 +597,7 @@ Using this procedure, write a procedure search-for-primes that checks the primal
          (+ n 2)
          (if (timed-prime-test n) (- count 1) count))))
   (search-for-primes-iter
-   (if (even? start) (+ start 1) start)
+   (if (divides? 2 start) (+ start 1) start)
    3))
 #+end_src
 
@@ -644,6 +644,104 @@ m = 70175
 #+tblfm: $3=$2-70175*(sqrt($1)/sqrt(100000))::@11$3=vvar(@I..@II)
 
 * Exercise 1.23
+The smallest-divisor procedure shown at the start of this section does lots of needless testing: After it checks to see if the number is divisible by 2 there is no point in checking to see if it is divisible by any larger even numbers. This suggests that the values used for test-divisor should not be 2, 3, 4, 5, 6, …, but rather 2, 3, 5, 7, 9, …. To implement this change, define a procedure next that returns 3 if its input is equal to 2 and otherwise returns its input plus 2. Modify the smallest-divisor procedure to use (next test-divisor) instead of (+ test-divisor 1). With timed-prime-test incorporating this modified version of smallest-divisor, run the test for each of the 12 primes found in Exercise 1.22. Since this modification halves the number of test steps, you should expect it to run about twice as fast. Is this expectation confirmed? If not, what is the observed ratio of the speeds of the two algorithms, and how do you explain the fact that it is different from 2?
+
+** Solution
+#+begin_src scheme
+(load-from-path "1_23-definitions.scm")
+(search-for-primes 100000)
+(search-for-primes 1000000)
+(search-for-primes 10000000)
+(search-for-primes 100000000)
+#+end_src
+
+#+RESULTS:
+#+begin_example
+100003 | 28128
+100019 | 10090
+100043 | 10186
+1000003 | 29715
+1000033 | 29531
+1000037 | 29554
+10000019 | 91376
+10000079 | 91356
+10000103 | 91318
+100000007 | 289935
+100000037 | 289866
+100000039 | 301755
+#+end_example
+
+
+|         n | T_n (ns) | T2_n (ns) |   T_n/T2_n |
+|-----------+----------+-----------+------------|
+|    100003 |    71004 |     28128 |  1.7497720 |
+|    100019 |    69836 |     10090 |  1.7098227 |
+|    100043 |    69686 |     10186 |  1.8632122 |
+|   1000003 |   413345 |     29715 |  3.6276472 |
+|   1000033 |   417740 |     29531 |  3.7525377 |
+|   1000037 |   417630 |     29554 |  3.7956357 |
+|  10000019 |   692164 |     91376 |  1.1983781 |
+|  10000079 |   673696 |     91356 |  1.1906816 |
+|  10000103 |   697857 |     91318 |  1.1779986 |
+| 100000007 |  1731865 |    289935 |  1.5999182 |
+| 100000037 |  1448142 |    289866 | 0.68569829 |
+| 100000039 |  1630682 |    301755 | 0.74455436 |
+#+TBLFM: $4=$2/$3
+
+* Exercise 1.24
+Modify the timed-prime-test procedure of Exercise 1.22 to use fast-prime? (the Fermat method), and test each of the 12 primes you found in that exercise. Since the Fermat test has Θ(log n) growth, how would you expect the time to test primes near 1,000,000 to compare with the time needed to test primes near 1000? Do your data bear this out? Can you explain any discrepancy you find?
+
+** Solution
+#+begin_src scheme
+(load-from-path "1_24-definitions.scm")
+(map timed-prime-test '(100003
+                        100019
+                        100043
+                        1000003
+                        1000033
+                        1000037
+                        10000019
+                        10000079
+                        10000103
+                        100000007
+                        100000037
+                        100000039))
+#+end_src
+
+#+RESULTS:
+#+begin_example
+100003 | 14723
+100019 | 28481
+100043 | 6019
+1000003 | 4187
+1000033 | 4104
+1000037 | 4228
+10000019 | 6296
+10000079 | 5024
+10000103 | 4929
+100000007 | 5661
+100000037 | 5435
+100000039 | 7817
+#+end_example
+
+D_n = T3_n/T2_n - log(n)/sqrt(n)
+
+|         n | T2_n (ns) | T3_n (ns) |         D_n |
+|-----------+-----------+-----------+-------------|
+|    100003 |     28128 |      1472 | 0.015925580 |
+|    100019 |     10090 |      2848 |  0.24585545 |
+|    100043 |     10186 |      6019 |  0.55450849 |
+|   1000003 |     29715 |      4187 |  0.12708977 |
+|   1000033 |     29531 |      4104 |  0.12515729 |
+|   1000037 |     29554 |      4228 |  0.12924487 |
+|  10000019 |     91376 |      6296 | 0.063805134 |
+|  10000079 |     91356 |      5024 | 0.049896679 |
+|  10000103 |     91318 |      4929 | 0.048879249 |
+| 100000007 |    289935 |      5661 | 0.017682998 |
+| 100000037 |    289866 |      5435 | 0.016907975 |
+| 100000039 |    301755 |      7817 | 0.024063054 |
+#+tblfm: $4=$3/$2 - log($1)/sqrt($1)
+
 * Footer
 # Local Variables:
 # eval: (olivetti-mode 1)
