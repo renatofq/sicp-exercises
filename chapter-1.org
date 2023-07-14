@@ -742,6 +742,42 @@ D_n = T3_n/T2_n - log(n)/sqrt(n)
 | 100000039 |    301755 |      7817 | 0.024063054 |
 #+tblfm: $4=$3/$2 - log($1)/sqrt($1)
 
+* Exercise 1.25
+Alyssa P. Hacker complains that we went to a lot of extra work in writing expmod. After all, she says, since we already know how to compute exponentials, we could have simply written
+
+#+begin_src scheme :eval never
+(define (expmod base exp m)
+  (remainder (fast-expt base exp) m))
+#+end_src
+
+Is she correct? Would this procedure serve as well for our fast prime tester? Explain.
+
+** Solution
+While mathematically both functions are equivalent, Alissa P Hacker solution will produce very large intermediate results that will slowdown the computation or even make the calculation impractical.
+
+* Exercise 1.26
+Louis Reasoner is having great difficulty doing Exercise 1.24. His fast-prime? test seems to run more slowly than his prime? test. Louis calls his friend Eva Lu Ator over to help. When they examine Louis’s code, they find that he has rewritten the expmod procedure to use an explicit multiplication, rather than calling square:
+
+#+begin_src scheme :eval never
+(define (expmod base exp m)
+  (cond ((= exp 0) 1)
+        ((even? exp)
+         (remainder
+          (* (expmod base (/ exp 2) m)
+             (expmod base (/ exp 2) m))
+          m))
+        (else
+         (remainder
+          (* base
+             (expmod base (- exp 1) m))
+          m))))
+#+end_src
+
+“I don’t see what difference that could make,” says Louis. “I do.” says Eva. “By writing the procedure like that, you have transformed the Θ(log n) process into a Θ(n) process.” Explain.
+
+** Solution
+expmod will be evaluated twice for even exponents nullifying the effect of dividing the exponent by 2. In other words expmod will be evaluated n times.
+
 * Footer
 # Local Variables:
 # eval: (olivetti-mode 1)
