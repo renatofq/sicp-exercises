@@ -1176,6 +1176,7 @@ Accumulate takes as arguments the same term and range specifications as sum and 
 2. If your accumulate procedure generates a recursive process, write one that generates an iterative process. If it generates an iterative process, write one that generates a recursive process.
 
 ** Solution
+*** Recursive
 #+begin_src scheme
 (define (accumulate combiner null-value term a next b)
   (if (> a b)
@@ -1205,6 +1206,7 @@ Accumulate takes as arguments the same term and range specifications as sum and 
 #+RESULTS:
 :  Ok: 2 tests passed.
 
+*** Iterative
 #+begin_src scheme
 (define (accumulate combiner null-value term a next b)
   (define (iter a result)
@@ -1228,6 +1230,43 @@ Accumulate takes as arguments the same term and range specifications as sum and 
 (test-begin "1.32 - Iterative Accumulate")
 (test-equal 120 (factorial 5))
 (test-equal 15  (sum-of-naturals 5))
+(test-end)
+#+end_src
+
+#+RESULTS:
+:  Ok: 2 tests passed.
+
+* Exercise 1.33
+You can obtain an even more general version of accumulate (Exercise 1.32) by introducing the notion of a filter on the terms to be combined. That is, combine only those terms derived from values in the range that satisfy a specified condition. The resulting filtered-accumulate abstraction takes the same arguments as accumulate, together with an additional predicate of one argument that specifies the filter. Write filtered-accumulate as a procedure. Show how to express the following using filtered-accumulate:
+1. the sum of the squares of the prime numbers in the interval a to b (assuming that you have a prime? predicate already written)
+2. the product of all the positive integers less than n that are relatively prime to n (i.e., all positive integers $i<n$ such that $GCD(i,n)=1$).
+
+** Solution
+#+begin_src scheme
+(load-from-path "1_33-definitions.scm")
+(define (filtered-accumulate predicate combiner null-value term a next b)
+  (define (evaluate-result result value)
+    (if (not (predicate value))
+        result
+        (combiner result value)))
+  (define (iter a result)
+    (if (> a b)
+        result
+        (iter (next a) (evaluate-result result (term a)))))
+  (iter a null-value))
+
+(define (sum-of-squares-of-primes a b)
+  (define (sum-square r n)
+    (+ r (square n)))
+  (filtered-accumulate prime? sum-square 0 identity a inc b))
+
+(define (product-of-coprimes n)
+  (define (coprime? a) (= 1 (gcd a n)))
+  (filtered-accumulate coprime? * 1 identity 2 inc (- n 1)))
+
+(test-begin "1.33 - Iterative Accumulate")
+(test-equal 87 (sum-of-squares-of-primes 2 7))
+(test-equal 5 (product-of-coprimes 6))
 (test-end)
 #+end_src
 
