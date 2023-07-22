@@ -690,23 +690,20 @@ There is a clever algorithm for computing the Fibonacci numbers in a logarithmic
 (define (fib-iter a b p q count)
   (cond ((= count 0) b)
         ((even? count)
-         (let ((p-squared (* p p))
-               (q-squared (* q q)))
-           (fib-iter a
+         (fib-iter a
                    b
-                   (+ p-squared q-squared)
-                   (+ q-squared (* 2 p q))
-                   (/ count 2))))
+                   (+ (* p p) (* q q))
+                   (+ (* q q) (* 2 p q))
+                   (/ count 2)))
         (else
-         (let ((aq (* a q)))
-           (fib-iter (+ (* b q)
-                        aq
-                        (* a p))
-                     (+ (* b p)
-                        aq)
-                     p
-                     q
-                     (- count 1))))))
+         (fib-iter (+ (* b q)
+                      (* a q)
+                      (* a p))
+                   (+ (* b p)
+                      (* a q))
+                   p
+                   q
+                   (- count 1)))))
 
 (test-begin "1.18 - Iterative Fibonacci calculation in O(log2 n) time")
 (test-equal 1  (fib 1))
