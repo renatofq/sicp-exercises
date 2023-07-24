@@ -1164,11 +1164,11 @@ Pi approximation
 
 * Exercise 1.32
 1. Show that sum and product (Exercise 1.31) are both special cases of a still more general notion called accumulate that combines a collection of terms, using some general accumulation function:
-#+begin_src scheme :eval never
-(accumulate
- combiner null-value term a next b)
-#+end_src
-Accumulate takes as arguments the same term and range specifications as sum and product, together with a combiner procedure (of two arguments) that specifies how the current term is to be combined with the accumulation of the preceding terms and a null-value that specifies what base value to use when the terms run out. Write accumulate and show how sum and product can both be defined as simple calls to accumulate.
+   #+begin_src scheme :eval never
+   (accumulate
+    combiner null-value term a next b)
+   #+end_src
+   Accumulate takes as arguments the same term and range specifications as sum and product, together with a combiner procedure (of two arguments) that specifies how the current term is to be combined with the accumulation of the preceding terms and a null-value that specifies what base value to use when the terms run out. Write accumulate and show how sum and product can both be defined as simple calls to accumulate.
 
 2. If your accumulate procedure generates a recursive process, write one that generates an iterative process. If it generates an iterative process, write one that generates a recursive process.
 
@@ -1271,7 +1271,7 @@ You can obtain an even more general version of accumulate (Exercise 1.32) by int
 :  Ok: 2 tests passed.
 
 * Exercise 1.34
-Exercise 1.34: Suppose we define the procedure
+Suppose we define the procedure
 #+begin_src scheme :eval never
 (define (f g) (g 2))
 #+end_src
@@ -1287,6 +1287,190 @@ What happens if we (perversely) ask the interpreter to evaluate the combination 
 
 ** Solution
 It will expand to (2 2) and raise an error trying to execute 2 as a procedure.
+
+* Exercise 1.35
+Show that the golden ratio $\varphi$ (1.2.2) is a fixed point of the transformation $x \mapsto 1 + 1/x$, and use this fact to compute $\varphi$ by means of the fixed-point procedure.
+
+** Solution
+#+begin_src scheme
+(define tolerance 0.00001)
+(define (fixed-point f first-guess)
+  (define (close-enough? v1 v2)
+    (< (abs (- v1 v2))
+       tolerance))
+  (define (try guess)
+    (let ((next (f guess)))
+      (if (close-enough? guess next)
+          next
+          (try next))))
+  (try first-guess))
+
+(define (approximate-phi)
+  (fixed-point
+   (lambda (x) (+ 1 (/ 1 x)))
+   1.0))
+
+(test-begin "1.35 - approximate phi")
+(test-approximate 1.61803 (approximate-phi) tolerance)
+(test-end)
+#+end_src
+
+#+RESULTS:
+:  Ok: 1 tests passed.
+
+* Exercise 1.36
+Modify fixed-point so that it prints the sequence of approximations it generates, using the newline and display primitives shown in Exercise 1.22. Then find a solution to $x^x = 1000$ by finding a fixed point of $x \mapsto log(1000)/log(x)$. (Use Scheme’s primitive log procedure, which computes natural logarithms.) Compare the number of steps this takes with and without average damping. (Note that you cannot start fixed-point with a guess of 1, as this would cause division by $log(1)=0$.)
+
+** Solution
+#+begin_src scheme
+(define tolerance 0.00001)
+(define (fixed-point f first-guess)
+  (define (close-enough? v1 v2)
+    (< (abs (- v1 v2))
+       tolerance))
+  (define (try guess)
+    (display guess)
+    (newline)
+    (let ((next (f guess)))
+      (if (close-enough? guess next)
+          next
+          (try next))))
+  (try first-guess))
+
+(define (average x y) (/ (+ x y) 2))
+
+(display "Without average damping")
+(newline)
+(display (fixed-point
+          (lambda (x)
+            (/ (log 1000) (log x)))
+          10.0))
+(newline)
+
+(newline)
+(display "With average damping")
+(newline)
+(display (fixed-point
+          (lambda (x)
+            (average x (/ (log 1000) (log x))))
+          10.0))
+(newline)
+;; (test-begin "1.35 - approximate phi")
+;; (test-approximate 1.61803  tolerance)
+;; (test-end)
+#+end_src
+
+#+RESULTS:
+#+begin_example
+Without average damping
+10.0
+2.9999999999999996
+6.2877098228681545
+3.7570797902002955
+5.218748919675316
+4.1807977460633134
+4.828902657081293
+4.386936895811029
+4.671722808746095
+4.481109436117821
+4.605567315585735
+4.522955348093164
+4.577201597629606
+4.541325786357399
+4.564940905198754
+4.549347961475409
+4.5596228442307565
+4.552843114094703
+4.55731263660315
+4.554364381825887
+4.556308401465587
+4.555026226620339
+4.55587174038325
+4.555314115211184
+4.555681847896976
+4.555439330395129
+4.555599264136406
+4.555493789937456
+4.555563347820309
+4.555517475527901
+4.555547727376273
+4.555527776815261
+4.555540933824255
+4.555532257016376
+
+With average damping
+10.0
+6.5
+5.095215099176933
+4.668760681281611
+4.57585730576714
+4.559030116711325
+4.55613168520593
+4.555637206157649
+4.55555298754564
+4.555538647701617
+4.555536206185039
+#+end_example
+
+* Exercise 1.37
+1. An infinite continued fraction is an expression of the form
+   \[
+   f = \frac{N_1}{D_1 + \frac{N_2}{D_2 + \frac{N_3}{D_3 + \cdots}}}.
+   \]
+   As an example, one can show that the infinite continued fraction expansion with the $N_i$ and the $D_i$ all equal to 1 produces $1/\varphi$, where $\varphi$ is the golden ratio (described in 1.2.2). One way to approximate an infinite continued fraction is to truncate the expansion after a given number of terms. Such a truncation-a so-called finite continued fraction k-term finite continued fraction-has the form
+   \[
+   \frac{N_1}{D_1 + \frac{N_2}{\ddots + \frac{N_k}{D_k}}}.
+   \]
+   Suppose that n and d are procedures of one argument (the term index i) that return the $N_i$ and $D_i$ of the terms of the continued fraction. Define a procedure cont-frac such that evaluating (cont-frac n d k) computes the value of the k-term finite continued fraction. Check your procedure by approximating $1/\varphi$ using
+   #+begin_src scheme :eval never
+   (cont-frac (lambda (i) 1.0)
+              (lambda (i) 1.0)
+              k)
+   #+end_src
+   for successive values of k. How large must you make k in order to get an approximation that is accurate to 4 decimal places?
+
+2. If your cont-frac procedure generates a recursive process, write one that generates an iterative process. If it generates an iterative process, write one that generates a recursive process.
+
+** Solution
+*** Recursive
+#+begin_src scheme
+(define (cont-frac n d k)
+  (define (recurse i)
+    (if (= i k)
+        (/ (n k) (d k))
+        (/ (n i) (+ (d i) (recurse (+ i 1))))))
+  (recurse 1))
+
+(display (cont-frac
+          (lambda (i) 1.0)
+          (lambda (i) 1.0)
+          11))
+
+#+end_src
+
+#+RESULTS:
+: 0.6180555555555556
+
+*** Iterative
+#+begin_src scheme
+(define (cont-frac n d k)
+  (define (iter k result)
+    (if (= k 0)
+        result
+        (iter
+         (- k 1)
+         (/ (n k)
+            (+ (d k) result)))))
+  (iter (- k 1) (/ (n k) (d k))))
+
+(display (cont-frac
+          (lambda (i) 1.0)
+          (lambda (i) 1.0)
+          11))
+#+end_src
+
+#+RESULTS:
+: 0.6180555555555556
 
 
 * meta                                                            :noexport:
