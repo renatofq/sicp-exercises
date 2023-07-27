@@ -6,3 +6,5 @@
 *.log
 *.out
 *.aux
+*.tex
+chapter-1.txt
