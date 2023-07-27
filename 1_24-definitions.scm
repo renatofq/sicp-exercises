@@ -1,12 +1,6 @@
 (define (runtime)
   (get-internal-run-time))
 
-(define (even? n)
-  (= (remainder n 2) 0))
-
-(define (square n)
-  (* n n))
-
 (define (expmod base exp m)
   (cond ((= exp 0) 1)
         ((even? exp)

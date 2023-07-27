@@ -1,10 +1,3 @@
-(define (identity x) x)
-(define (inc n) (+ n 1))
-(define (square n) (* n n))
-
-(define (divides? a b)
-  (= (remainder b a) 0))
-
 (define (gcd a b)
   (if (= b 0)
       a

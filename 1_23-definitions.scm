@@ -1,8 +1,6 @@
 (define (runtime)
   (get-internal-run-time))
 
-(define (square n) (* n n))
-
 (define (smallest-divisor n)
   (if (divides? 2 n)
       2

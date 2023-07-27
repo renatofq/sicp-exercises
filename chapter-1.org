@@ -74,7 +74,6 @@ Define a procedure that takes three numbers as arguments and returns the sum of 
              (else b)))
   (+ (* x x) (* y y)))
 
-(test-begin "1.3 sum-of-squares")
 (test-assert
     (=
      25
@@ -84,11 +83,7 @@ Define a procedure that takes three numbers as arguments and returns the sum of 
      (weird-sum-of-squares 3 4 2)
      (weird-sum-of-squares 4 2 3)
      (weird-sum-of-squares 4 3 2)))
-(test-end)
 #+end_src
-
-#+RESULTS:
-:  Ok: 1 tests passed.
 
 * Exercise 1.4
 Observe that our model of evaluation allows for combinations whose operators are compound expressions. Use this observation to describe the behavior of the following procedure:
@@ -181,13 +176,9 @@ The good-enough? test used in computing square roots will not be very effective 
 (define (sqrt x)
   (sqrt-iter x 0.0 1.0))
 
-(test-begin "1.7 - iterative sqrt")
 (test-approximate 100000.0 (sqrt 10000000000.0) 0.001)
-(test-end)
 #+end_src
 
-#+RESULTS:
-:  Ok: 1 tests passed.
 
 * Exercise 1.8
 Newton’s method for cube roots is based on the fact that if y is an approximation to the cube root of x, then a better approximation is given by the value:
@@ -198,6 +189,9 @@ Use this formula to implement a cube-root procedure analogous to the square-root
 
 ** Solution
 #+begin_src scheme
+(define (good-enough? last-guess guess)
+  (< (abs (- 1 (/ last-guess guess))) 0.001))
+
 (define (improve-cube-root-guess y x)
   (/ (+ (/ x (* y y)) (* 2 y)) 3))
 
@@ -209,13 +203,8 @@ Use this formula to implement a cube-root procedure analogous to the square-root
 (define (cube-root x)
   (cube-root-iter x 0.0 1.0))
 
-(test-begin "1.8 - iterative cube root")
 (test-approximate 3 (cube-root 27) 0.001)
-(test-end)
 #+end_src
-
-#+RESULTS:
-:  Ok: 1 tests passed.
 
 * Exercise 1.9
 Each of the following two procedures defines a method for adding two positive integers in terms of the procedures inc, which increments its argument by 1, and dec, which decrements its argument by 1.
@@ -325,18 +314,13 @@ A function f is defined by the rule that $f(n)=n$ if $n<3$ and $f(n)=f(n-1)+2f(n
        (* 2 (f (- n 2)))
        (* 3 (f (- n 3))))))
 
-(test-begin "1.11 - recursive")
 (test-equal 0 (f 0))
 (test-equal 1 (f 1))
 (test-equal 2 (f 2))
 (test-equal 4 (f 3))
 (test-equal 11 (f 4))
 (test-equal 25 (f 5))
-(test-end)
 #+end_src
-
-#+RESULTS: recursive
-:  Ok: 6 tests passed.
 
 *** Iterative
 #+name: iterative
@@ -352,18 +336,13 @@ A function f is defined by the rule that $f(n)=n$ if $n<3$ and $f(n)=f(n-1)+2f(n
       n
       (f-iter 2 1 0 (- n 2))))
 
-(test-begin "1.11 - iterative")
 (test-equal 0 (f 0))
 (test-equal 1 (f 1))
 (test-equal 2 (f 2))
 (test-equal 4 (f 3))
 (test-equal 11 (f 4))
 (test-equal 25 (f 5))
-(test-end)
 #+end_src
-
-#+RESULTS: iterative
-:  Ok: 6 tests passed.
 
 * Exercise 1.12
 The following pattern of numbers is called Pascal’s triangle.
@@ -388,13 +367,8 @@ The numbers at the edge of the triangle are all 1, and each number inside the tr
         (pascal-triangle (- r 1) (- k 1))
         (pascal-triangle (- r 1) k))))
 
-(test-begin "1.12 - pascal triangle")
 (test-equal 6 (pascal-triangle 5 3))
-(test-end)
 #+end_src
-
-#+RESULTS:
-:  Ok: 1 tests passed.
 
 * Exercise 1.13
 Prove that $Fib(n)$ is the closest integer to $\varphi^n/\sqrt{5}$ where $\varphi = (1 + \sqrt{5})/2$. Hint: Let $\psi = (1 - \sqrt{5})/2$. Use induction and the definition of the Fibonacci numbers (see 1.2.2) to prove that $Fib(n) = (\varphi^n - \psi^n) / \sqrt{5}$.
@@ -568,7 +542,6 @@ Design a procedure that evolves an iterative exponentiation process that uses su
           (else  (expt-iter b (- n 1) (* a b)))))
   (expt-iter b n 1))
 
-(test-begin "1.16 - Iterative exponentiation in O(log2 n) time")
 (test-equal 1 (expt 10 0))
 (test-equal 7 (expt 7 1))
 (test-equal 9 (expt 3 2))
@@ -579,11 +552,7 @@ Design a procedure that evolves an iterative exponentiation process that uses su
 (test-equal 78125 (expt 5 7))
 (test-equal 256 (expt 2 8))
 (test-equal 19683 (expt 3 9))
-(test-end)
 #+end_src
-
-#+RESULTS:
-:  Ok: 10 tests passed.
 
 * Exercise 1.17
 The exponentiation algorithms in this section are based on performing exponentiation by means of repeated multiplication. In a similar way, one can perform integer multiplication by means of repeated addition. The following multiplication procedure (in which it is assumed that our language can only add, not multiply) is analogous to the expt procedure:
@@ -599,14 +568,12 @@ This algorithm takes a number of steps that is linear in b. Now suppose we inclu
 
 ** Solution
 #+begin_src scheme
-(define (even? n) (= 0 (remainder n 2)))
 (define (halve n) (/ n 2))
 (define (multi a b)
     (cond ((= b 0) 0)
           ((even? b) (multi (+ a a) (halve b)))
           (else  (+ a (multi a (- b 1) )))))
 
-(test-begin "1.17 - Recursive multiplication in O(log2 n) time")
 (test-equal 0 (multi 10 0))
 (test-equal 7 (multi 7 1))
 (test-equal 6 (multi 3 2))
@@ -617,12 +584,7 @@ This algorithm takes a number of steps that is linear in b. Now suppose we inclu
 (test-equal 35 (multi 5 7))
 (test-equal 16 (multi 2 8))
 (test-equal 27 (multi 3 9))
-(test-end)
 #+end_src
-
-
-#+RESULTS:
-:  Ok: 10 tests passed.
 
 * Exercise 1.18
 Using the results of Exercise 1.16 and Exercise 1.17, devise a procedure that generates an iterative process for multiplying two integers in terms of adding, doubling, and halving and uses a logarithmic number of steps.
@@ -630,7 +592,6 @@ Using the results of Exercise 1.16 and Exercise 1.17, devise a procedure that ge
 ** Solution
 #+begin_src scheme
 (define (multi a b)
-  (define (even? n) (= 0 (remainder n 2)))
   (define (halve n) (/ n 2))
   (define (multi-iter a b c)
     (cond ((= b 0) c)
@@ -638,7 +599,6 @@ Using the results of Exercise 1.16 and Exercise 1.17, devise a procedure that ge
           (else  (multi-iter a (- b 1) (+ c a)))))
   (multi-iter a b 0))
 
-(test-begin "1.18 - Iterative multiplication in O(log2 n) time")
 (test-equal 0 (multi 10 0))
 (test-equal 7 (multi 7 1))
 (test-equal 6 (multi 3 2))
@@ -649,11 +609,7 @@ Using the results of Exercise 1.16 and Exercise 1.17, devise a procedure that ge
 (test-equal 35 (multi 5 7))
 (test-equal 16 (multi 2 8))
 (test-equal 27 (multi 3 9))
-(test-end)
 #+end_src
-
-#+RESULTS:
-:  Ok: 10 tests passed.
 
 * Exercise 1.19
 There is a clever algorithm for computing the Fibonacci numbers in a logarithmic number of steps. Recall the transformation of the state variables a and b in the fib-iter process of 1.2.2: $a \leftarrow a + b$ and $b \leftarrow a$. Call this transformation T, and observe that applying T over and over again n times, starting with 1 and 0, produces the pair $Fib(n + 1)$ and $Fib(n)$. In other words, the Fibonacci numbers are produced by applying $T^n$, the nth power of the transformation T, starting with the pair $(1, 0)$. Now consider T to be the special case of $p = 0$ and $q = 1$ in a family of transformations $T_{pq}$, where $T_{pq}$ transforms the pair $(a, b)$ according to $a \leftarrow bq + aq + ap$ and $b \leftarrow bp + aq$. Show that if we apply such a transformation $T_{pq}$ twice, the effect is the same as using a single transformation $T_{p'q'}$ of the same form, and compute $p'$ and $q'$ in terms of p and q. This gives us an explicit way to square these transformations, and thus we can compute $T^n$ using successive squaring, as in the fast-expt procedure. Put this all together to complete the following procedure, which runs in a logarithmic number of steps:
@@ -705,7 +661,6 @@ There is a clever algorithm for computing the Fibonacci numbers in a logarithmic
                    q
                    (- count 1)))))
 
-(test-begin "1.18 - Iterative Fibonacci calculation in O(log2 n) time")
 (test-equal 1  (fib 1))
 (test-equal 1  (fib 2))
 (test-equal 2  (fib 3))
@@ -716,11 +671,7 @@ There is a clever algorithm for computing the Fibonacci numbers in a logarithmic
 (test-equal 610 (fib 15))
 (test-equal 1548008755920 (fib 60))
 (test-equal 2880067194370816120 (fib 90))
-(test-end)
 #+end_src
-
-#+RESULTS:
-:  Ok: 10 tests passed.
 
 * Exercise 1.20
 The process that a procedure generates is of course dependent on the rules used by the interpreter. As an example, consider the iterative gcd procedure given above. Suppose we were to interpret this procedure using normal-order evaluation, as discussed in 1.1.5. (The normal-order-evaluation rule for if is described in Exercise 1.5.) Using the substitution method (for normal order), illustrate the process generated in evaluating (gcd 206 40) and indicate the remainder operations that are actually performed. How many remainder operations are actually performed in the normal-order evaluation of (gcd 206 40)? In the applicative-order evaluation?
@@ -826,7 +777,7 @@ m = 70175
 The smallest-divisor procedure shown at the start of this section does lots of needless testing: After it checks to see if the number is divisible by 2 there is no point in checking to see if it is divisible by any larger even numbers. This suggests that the values used for test-divisor should not be 2, 3, 4, 5, 6, …, but rather 2, 3, 5, 7, 9, …. To implement this change, define a procedure next that returns 3 if its input is equal to 2 and otherwise returns its input plus 2. Modify the smallest-divisor procedure to use (next test-divisor) instead of (+ test-divisor 1). With timed-prime-test incorporating this modified version of smallest-divisor, run the test for each of the 12 primes found in Exercise 1.22. Since this modification halves the number of test steps, you should expect it to run about twice as fast. Is this expectation confirmed? If not, what is the observed ratio of the speeds of the two algorithms, and how do you explain the fact that it is different from 2?
 
 ** Solution
-#+begin_src scheme
+#+begin_src scheme :eval query
 (load-from-path "1_23-definitions.scm")
 (search-for-primes 100000)
 (search-for-primes 1000000)
@@ -871,20 +822,20 @@ The smallest-divisor procedure shown at the start of this section does lots of n
 Modify the timed-prime-test procedure of Exercise 1.22 to use fast-prime? (the Fermat method), and test each of the 12 primes you found in that exercise. Since the Fermat test has $\theta(log n)$ growth, how would you expect the time to test primes near 1,000,000 to compare with the time needed to test primes near 1000? Do your data bear this out? Can you explain any discrepancy you find?
 
 ** Solution
-#+begin_src scheme
+#+begin_src scheme :eval query
 (load-from-path "1_24-definitions.scm")
-(map timed-prime-test '(100003
-                        100019
-                        100043
-                        1000003
-                        1000033
-                        1000037
-                        10000019
-                        10000079
-                        10000103
-                        100000007
-                        100000037
-                        100000039))
+(timed-prime-test 100003)
+(timed-prime-test 100019)
+(timed-prime-test 100043)
+(timed-prime-test 1000003)
+(timed-prime-test 1000033)
+(timed-prime-test 1000037)
+(timed-prime-test 10000019)
+(timed-prime-test 10000079)
+(timed-prime-test 10000103)
+(timed-prime-test 100000007)
+(timed-prime-test 100000037)
+(timed-prime-test 100000039)
 #+end_src
 
 #+RESULTS:
@@ -964,9 +915,6 @@ Demonstrate that the Carmichael numbers listed in Footnote 47 really do fool the
 
 ** Solution
 #+begin_src scheme
-(define (even? n) (= (remainder n 2) 0))
-(define (square n) (* n n))
-(define (inc n) (+ n 1))
 (define (expmod base exp m)
   (cond ((= exp 0) 1)
         ((even? exp)
@@ -986,26 +934,19 @@ Demonstrate that the Carmichael numbers listed in Footnote 47 really do fool the
           (else #f)))
   (exaustive-fermat-test-iter n 1))
 
-(test-begin "1.27 - Charmichael numbers")
 (test-assert (exaustive-fermat-test 561))
 (test-assert (exaustive-fermat-test 1105))
 (test-assert (exaustive-fermat-test 1729))
 (test-assert (exaustive-fermat-test 2465))
 (test-assert (exaustive-fermat-test 2821))
 (test-assert (exaustive-fermat-test 6601))
-(test-end)
 #+end_src
-
-#+RESULTS:
-:  Ok: 6 tests passed.
 
 * Exercise 1.28
 One variant of the Fermat test that cannot be fooled is called the Miller-Rabin test (Miller 1976; Rabin 1980). This starts from an alternate form of Fermat’s Little Theorem, which states that if n is a prime number and a is any positive integer less than n, then a raised to the \((n-1)\)-st power is congruent to 1 modulo n. To test the primality of a number n by the Miller-Rabin test, we pick a random number $a < n$ and raise a to the \((n-1)\)-st power modulo n using the expmod procedure. However, whenever we perform the squaring step in expmod, we check to see if we have discovered a “nontrivial square root of 1 modulo n,” that is, a number not equal to 1 or $n-1$ whose square is equal to 1 modulo n. It is possible to prove that if such a nontrivial square root of 1 exists, then n is not prime. It is also possible to prove that if n is an odd number that is not prime, then, for at least half the numbers $a<n$, computing $a^{n-1}$ in this way will reveal a nontrivial square root of 1 modulo n. (This is why the Miller-Rabin test cannot be fooled.) Modify the expmod procedure to signal if it discovers a nontrivial square root of 1, and use this to implement the Miller-Rabin test with a procedure analogous to fermat-test. Check your procedure by testing various known primes and non-primes. Hint: One convenient way to make expmod signal is to have it return 0.
 
 ** Solution
 #+begin_src scheme
-(define (even? n) (= (remainder n 2) 0))
-(define (square n) (* n n))
 (define (guess-a n)
   (+ 1 (random (- n 1))))
 
@@ -1032,7 +973,6 @@ One variant of the Fermat test that cannot be fooled is called the Miller-Rabin 
 (define (miller-rabin-test n)
   (= 1 (expmod (guess-a n) (- n 1) n)))
 
-(test-begin "1.28 - Miller-Rabin test")
 (test-assert (miller-rabin-test 11))
 (test-assert (miller-rabin-test 23))
 (test-assert (miller-rabin-test 100003))
@@ -1053,11 +993,7 @@ One variant of the Fermat test that cannot be fooled is called the Miller-Rabin 
 (test-assert (not (miller-rabin-test 2465)))
 (test-assert (not (miller-rabin-test 2821)))
 (test-assert (not (miller-rabin-test 6601)))
-(test-end)
 #+end_src
-
-#+RESULTS:
-:  Ok: 20 tests passed.
 
 * Exercise 1.29
 Simpson’s Rule is a more accurate method of numerical integration than the method illustrated above. Using Simpson’s Rule, the integral of a function f between a and b is approximated as \(\frac{h}{3}(y_0 + 4y_1 + 2y_2 + 4y_3 + 2y_4 + \cdots + 2y_{n−2} + 4y_{n−1} + y_n) \), where \(h = (b-a)/n \), for some even integer n, and $y_k = f(a+kh)$. (Increasing n increases the accuracy of the approximation.) Define a procedure that takes as arguments f, a, b, and n and returns the value of the integral, computed using Simpson’s Rule. Use your procedure to integrate cube between 0 and 1 (with $n=100$ and $n=1000$), and compare the results to those of the integral procedure shown above.
@@ -1070,24 +1006,15 @@ Simpson’s Rule is a more accurate method of numerical integration than the met
       (+ (term a)
          (sum term (next a) next b))))
 
-(define (inc n) (+ n 1))
-
 (define (integral f a b n)
   (define h (/ (- b a) n))
   (define (y k) (f (+ a (* k h))))
   (define (term k) (* (y k) (+ 2 (* 2 (remainder k 2)))))
   (* (/ h 3) (+ (y 0) (y n) (sum term 1 inc (- n 1)))))
 
-(define (cube x) (* x x x))
-
-(test-begin "1.29 - Simpson's Rule")
 (test-equal (/ 1 4) (integral cube 0 1 100))
 (test-equal (/ 1 4) (integral cube 0 1 1000))
-(test-end)
 #+end_src
-
-#+RESULTS:
-:  Ok: 2 tests passed.
 
 * Exercise 1.30
 The sum procedure above generates a linear recursion. The procedure can be rewritten so that the sum is performed iteratively. Show how to do this by filling in the missing expressions in the following definition:
@@ -1109,6 +1036,8 @@ The sum procedure above generates a linear recursion. The procedure can be rewri
         result
         (iter (next a) (+ result (term a)))))
   (iter a 0))
+
+(test-equal 55 (sum identity 1 inc 10))
 #+end_src
 
 * Exercise 1.31
@@ -1123,8 +1052,8 @@ The sum procedure above generates a linear recursion. The procedure can be rewri
 2. If your product procedure generates a recursive process, write one that generates an iterative process. If it generates an iterative process, write one that generates a recursive process.
 
 ** Solution
-
-Pi approximation
+*** Recursive
+#+name recursive pi-approx
 #+begin_src scheme
 (define (product term a next b)
   (if (> a b)
@@ -1140,8 +1069,12 @@ Pi approximation
      (+ n+1 (remainder n+1 2))
      (+ n+1 (remainder n 2))))
   (* 4 (product term 1 inc n)))
+
+(test-approximate 3.141 (pi-approx 10000) 0.001)
 #+end_src
 
+*** Iterative
+#+name iterative pi-approx
 #+begin_src scheme
 (define (product term a next b)
   (define (iter a result)
@@ -1159,7 +1092,7 @@ Pi approximation
      (+ n+1 (remainder n 2))))
   (* 4 (product term 1 inc n)))
 
-(display (pi-approx 10000))
+(test-approximate 3.141 (pi-approx 10000) 0.001)
 #+end_src
 
 * Exercise 1.32
@@ -1187,21 +1120,14 @@ Pi approximation
 (define (sum term a next b)
   (accumulate + 0 term a next b))
 
-(define (identity x) x)
-(define (inc n) (+ n 1))
 (define (factorial n)
   (product identity 1 inc n))
 (define (sum-of-naturals n)
   (sum identity 1 inc n))
 
-(test-begin "1.32 - Recursive Accumulate")
 (test-equal 120 (factorial 5))
 (test-equal 15  (sum-of-naturals 5))
-(test-end)
 #+end_src
-
-#+RESULTS:
-:  Ok: 2 tests passed.
 
 *** Iterative
 #+begin_src scheme
@@ -1217,21 +1143,14 @@ Pi approximation
 (define (sum term a next b)
   (accumulate + 0 term a next b))
 
-(define (identity x) x)
-(define (inc n) (+ n 1))
 (define (factorial n)
   (product identity 1 inc n))
 (define (sum-of-naturals n)
   (sum identity 1 inc n))
 
-(test-begin "1.32 - Iterative Accumulate")
 (test-equal 120 (factorial 5))
 (test-equal 15  (sum-of-naturals 5))
-(test-end)
 #+end_src
-
-#+RESULTS:
-:  Ok: 2 tests passed.
 
 * Exercise 1.33
 You can obtain an even more general version of accumulate (Exercise 1.32) by introducing the notion of a filter on the terms to be combined. That is, combine only those terms derived from values in the range that satisfy a specified condition. The resulting filtered-accumulate abstraction takes the same arguments as accumulate, together with an additional predicate of one argument that specifies the filter. Write filtered-accumulate as a procedure. Show how to express the following using filtered-accumulate:
@@ -1261,14 +1180,9 @@ You can obtain an even more general version of accumulate (Exercise 1.32) by int
   (define (coprime? a) (= 1 (gcd a n)))
   (filtered-accumulate coprime? * 1 identity 2 inc (- n 1)))
 
-(test-begin "1.33 - Iterative Accumulate")
 (test-equal 87 (sum-of-squares-of-primes 2 7))
 (test-equal 5 (product-of-coprimes 6))
-(test-end)
 #+end_src
-
-#+RESULTS:
-:  Ok: 2 tests passed.
 
 * Exercise 1.34
 Suppose we define the procedure
@@ -1292,6 +1206,10 @@ It will expand to (2 2) and raise an error trying to execute 2 as a procedure.
 Show that the golden ratio $\varphi$ (1.2.2) is a fixed point of the transformation $x \mapsto 1 + 1/x$, and use this fact to compute $\varphi$ by means of the fixed-point procedure.
 
 ** Solution
+Given that $\varphi$ solves the equation $x^2 = x + 1$, see solution of 1.15, then
+\[ \varphi = \frac{\varphi + 1}{\varphi} \]
+\[ \varphi =  1 + \frac{1}{\varphi} \]
+
 #+begin_src scheme
 (define tolerance 0.00001)
 (define (fixed-point f first-guess)
@@ -1310,13 +1228,8 @@ Show that the golden ratio $\varphi$ (1.2.2) is a fixed point of the transformat
    (lambda (x) (+ 1 (/ 1 x)))
    1.0))
 
-(test-begin "1.35 - approximate phi")
 (test-approximate 1.61803 (approximate-phi) tolerance)
-(test-end)
 #+end_src
-
-#+RESULTS:
-:  Ok: 1 tests passed.
 
 * Exercise 1.36
 Modify fixed-point so that it prints the sequence of approximations it generates, using the newline and display primitives shown in Exercise 1.22. Then find a solution to $x^x = 1000$ by finding a fixed point of $x \mapsto log(1000)/log(x)$. (Use Scheme’s primitive log procedure, which computes natural logarithms.) Compare the number of steps this takes with and without average damping. (Note that you cannot start fixed-point with a guess of 1, as this would cause division by $log(1)=0$.)
@@ -1328,14 +1241,17 @@ Modify fixed-point so that it prints the sequence of approximations it generates
   (define (close-enough? v1 v2)
     (< (abs (- v1 v2))
        tolerance))
-  (define (try guess)
+  (define (try guess n)
+    (display "try #")
+    (display n)
+    (display ": ")
     (display guess)
     (newline)
     (let ((next (f guess)))
       (if (close-enough? guess next)
           next
-          (try next))))
-  (try first-guess))
+          (try next (inc n)))))
+  (try first-guess 1))
 
 (define (average x y) (/ (+ x y) 2))
 
@@ -1355,60 +1271,57 @@ Modify fixed-point so that it prints the sequence of approximations it generates
             (average x (/ (log 1000) (log x))))
           10.0))
 (newline)
-;; (test-begin "1.35 - approximate phi")
-;; (test-approximate 1.61803  tolerance)
-;; (test-end)
 #+end_src
 
 #+RESULTS:
 #+begin_example
 Without average damping
-10.0
-2.9999999999999996
-6.2877098228681545
-3.7570797902002955
-5.218748919675316
-4.1807977460633134
-4.828902657081293
-4.386936895811029
-4.671722808746095
-4.481109436117821
-4.605567315585735
-4.522955348093164
-4.577201597629606
-4.541325786357399
-4.564940905198754
-4.549347961475409
-4.5596228442307565
-4.552843114094703
-4.55731263660315
-4.554364381825887
-4.556308401465587
-4.555026226620339
-4.55587174038325
-4.555314115211184
-4.555681847896976
-4.555439330395129
-4.555599264136406
-4.555493789937456
-4.555563347820309
-4.555517475527901
-4.555547727376273
-4.555527776815261
-4.555540933824255
+try #1: 10.0
+try #2: 2.9999999999999996
+try #3: 6.2877098228681545
+try #4: 3.7570797902002955
+try #5: 5.218748919675316
+try #6: 4.1807977460633134
+try #7: 4.828902657081293
+try #8: 4.386936895811029
+try #9: 4.671722808746095
+try #10: 4.481109436117821
+try #11: 4.605567315585735
+try #12: 4.522955348093164
+try #13: 4.577201597629606
+try #14: 4.541325786357399
+try #15: 4.564940905198754
+try #16: 4.549347961475409
+try #17: 4.5596228442307565
+try #18: 4.552843114094703
+try #19: 4.55731263660315
+try #20: 4.554364381825887
+try #21: 4.556308401465587
+try #22: 4.555026226620339
+try #23: 4.55587174038325
+try #24: 4.555314115211184
+try #25: 4.555681847896976
+try #26: 4.555439330395129
+try #27: 4.555599264136406
+try #28: 4.555493789937456
+try #29: 4.555563347820309
+try #30: 4.555517475527901
+try #31: 4.555547727376273
+try #32: 4.555527776815261
+try #33: 4.555540933824255
 4.555532257016376
 
 With average damping
-10.0
-6.5
-5.095215099176933
-4.668760681281611
-4.57585730576714
-4.559030116711325
-4.55613168520593
-4.555637206157649
-4.55555298754564
-4.555538647701617
+try #1: 10.0
+try #2: 6.5
+try #3: 5.095215099176933
+try #4: 4.668760681281611
+try #5: 4.57585730576714
+try #6: 4.559030116711325
+try #7: 4.55613168520593
+try #8: 4.555637206157649
+try #9: 4.55555298754564
+try #10: 4.555538647701617
 4.555536206185039
 #+end_example
 
@@ -1441,15 +1354,26 @@ With average damping
         (/ (n i) (+ (d i) (recurse (+ i 1))))))
   (recurse 1))
 
-(display (cont-frac
-          (lambda (i) 1.0)
-          (lambda (i) 1.0)
-          11))
+(define (search-k-approx f start target error)
+  (if (<
+       (abs (- (f start) target))
+       error)
+  start
+  (search-k-approx f (+ start 1) target error)))
 
+(display (search-k-approx
+          (lambda (k)
+            (cont-frac
+             (lambda (i) 1.0)
+             (lambda (i) 1.0)
+             k))
+         3
+         0.61803398
+         0.0001))
 #+end_src
 
 #+RESULTS:
-: 0.6180555555555556
+: 10
 
 *** Iterative
 #+begin_src scheme
@@ -1463,15 +1387,145 @@ With average damping
             (+ (d k) result)))))
   (iter (- k 1) (/ (n k) (d k))))
 
-(display (cont-frac
-          (lambda (i) 1.0)
-          (lambda (i) 1.0)
-          11))
+(define (search-k-approx f start target error)
+  (if (<
+       (abs (- (f start) target))
+       error)
+  start
+  (search-k-approx f (+ start 1) target error)))
+
+(display
+ (search-k-approx
+  (lambda (k)
+    (cont-frac
+     (lambda (i) 1.0)
+     (lambda (i) 1.0)
+     k))
+  3
+  0.61803398
+  0.0001))
 #+end_src
 
 #+RESULTS:
-: 0.6180555555555556
+: 10
 
+* Exercise 1.38
+In 1737, the Swiss mathematician Leonhard Euler published a memoir De Fractionibus Continuis, which included a continued fraction expansion for $e−2$, where $e$ is the base of the natural logarithms. In this fraction, the $N_i$ are all 1, and the $D_i$ are successively $1, 2, 1, 1, 4, 1, 1, 6, 1, 1, 8, \cdots$. Write a program that uses your cont-frac procedure from Exercise 1.37 to approximate $e$, based on Euler’s expansion.
+
+** Solution
+#+begin_src scheme
+(define (cont-frac n d k)
+  (define (iter k result)
+    (if (= k 0)
+        result
+        (iter
+         (- k 1)
+         (/ (n k)
+            (+ (d k) result)))))
+  (iter (- k 1) (/ (n k) (d k))))
+
+(test-approximate 0.71828
+  (cont-frac
+   (lambda (i) 1.0)
+   (lambda (i)
+     (if (= (remainder i 3) 2)
+         (* 2 (+ (quotient i 3) 1))
+         1.0))
+   12)
+  0.00001)
+#+end_src
+
+* Exercise 1.39
+A continued fraction representation of the tangent function was published in 1770 by the German mathematician J.H. Lambert:
+\[
+\tan{x} = \frac{x}{1 - \frac{x^2}{3 - \frac{x^2}{5 - \cdots}}},
+\]
+where $x$ is in radians. Define a procedure (tan-cf x k) that computes an approximation to the tangent function based on Lambert’s formula. k specifies the number of terms to compute, as in Exercise 1.37.
+
+** Solution
+#+begin_src scheme
+(define (cont-frac n d k)
+  (define (recurse i)
+    (if (= i k)
+        (/ (n k) (d k))
+        (/ (n i) (+ (d i) (recurse (+ i 1))))))
+  (recurse 1))
+
+(define (tan-cf x k)
+  (cont-frac
+      (lambda (i)
+        (if (= i 1)
+            x
+            (- (* x x))))
+      (lambda (i)
+        (- (* i 2) 1))
+      k))
+
+(test-approximate (tan 0.0) (tan-cf 0.0 10) 0.0001)
+(test-approximate (tan 1.0) (tan-cf 1.0 10) 0.0001)
+(test-approximate (tan 2.0) (tan-cf 2.0 10) 0.0001)
+(test-approximate (tan 3.14159) (tan-cf 3.14159 10) 0.0001)
+#+end_src
+
+* Exercise 1.40
+Define a procedure cubic that can be used together with the newtons-method procedure in expressions of the form
+#+begin_src scheme :eval never
+(newtons-method (cubic a b c) 1)
+#+end_src
+to approximate zeros of the cubic $x^3+ax^2+bx+c$.
+
+** Solution
+#+begin_src scheme
+(define (fixed-point f first-guess)
+  (define (close-enough? v1 v2)
+    (< (abs (- v1 v2))
+       0.00001))
+  (define (try guess)
+    (let ((next (f guess)))
+      (if (close-enough? guess next)
+          next
+          (try next))))
+  (try first-guess))
+
+(define (deriv g dx)
+  (lambda (x)
+    (/ (- (g (+ x dx)) (g x))
+       dx)))
+
+(define (newton-transform g)
+  (lambda (x)
+    (- x (/ (g x)
+            ((deriv g 0.00001) x)))))
+
+(define (newtons-method g guess)
+  (fixed-point (newton-transform g)
+               guess))
+
+(define (cubic a b c)
+  (lambda (x)
+    (+ (cube x) (* a (square x)) (* b x) c)))
+
+(test-approximate 0.0
+  (let ((f (cubic 5 7 11)))
+    (f (newtons-method f 1.0)))
+  0.00001)
+#+end_src
+
+* Exercise 1.41
+Define a procedure double that takes a procedure of one argument as argument and returns a procedure that applies the original procedure twice. For example, if inc is a procedure that adds 1 to its argument, then (double inc) should be a procedure that adds 2. What value is returned by
+#+begin_src scheme :eval never
+(((double (double double)) inc) 5)
+#+end_src
+
+** Solution
+#+begin_src scheme
+(define (double f)
+  (lambda (x)
+    (f (f x))))
+
+(test-equal 3 ((double inc) 1))
+(test-equal 21 (((double (double double)) inc) 5))
+#+end_src
 
 * meta                                                            :noexport:
 #+PROPERTY: header-args :results output
@@ -1481,4 +1535,21 @@ With average damping
 # eval: (olivetti-mode 1)
 # eval: (flyspell-mode 1)
 # ispell-local-dictionary: "american"
+# eval: (advice-add
+#        'org-babel-insert-result
+#        :filter-args
+#        (lambda (args)
+#          (let ((result (car args))
+#                (result-params (cadr args))
+#                (others (cddr args)))
+#            (apply 'list
+#                   result
+#                   (if (or
+#                        (string-empty-p result) (not result))
+#                       (progn (org-babel-remove-result) '("silent"))
+#                     result-params)
+#                   others))))
+# eval: (add-hook 'geiser-repl-startup-hook
+#        (lambda ()
+#          (geiser-load-file "chapter-1-defs.scm")))
 # End:
