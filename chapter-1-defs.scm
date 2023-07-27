@@ -1,6 +1,7 @@
 ;; math functions
 (define (identity a) a)
 (define (inc n) (+ n 1))
+(define (dec n) (- n 1))
 (define (square x) (* x x))
 (define (cube x) (* x x x))
 

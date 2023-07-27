@@ -1527,6 +1527,86 @@ Define a procedure double that takes a procedure of one argument as argument and
 (test-equal 21 (((double (double double)) inc) 5))
 #+end_src
 
+* Exercise 1.42
+Let $f$ and $g$ be two one-argument functions. The composition $f$ after $g$ is defined to be the function $x \mapsto f(g(x))$. Define a procedure compose that implements composition. For example, if inc is a procedure that adds 1 to its argument,
+#+begin_src scheme :eval never
+((compose square inc) 6)
+49
+#+end_src
+
+** Solution
+#+begin_src scheme
+(define (compose f g)
+  (lambda (x) (f (g x))))
+
+(test-equal 49 ((compose square inc) 6))
+#+end_src
+
+* Exercise 1.43
+If $f$ is a numerical function and $n$ is a positive integer, then we can form the $n^{th}$ repeated application of $f$, which is defined to be the function whose value at $x$ is $f(f(\cdots(f(x))\cdots))$. For example, if $f$ is the function $x \mapsto x+1$, then the $n^{th}$ repeated application of $f$ is the function $x \mapsto x+n$. If $f$ is the operation of squaring a number, then the $n^{th}$ repeated application of $f$ is the function that raises its argument to the $2^n$-th power. Write a procedure that takes as inputs a procedure that computes $f$ and a positive integer $n$ and returns the procedure that computes the $n^{th}$ repeated application of $f$. Your procedure should be able to be used as follows:
+#+begin_src scheme
+((repeated square 2) 5)
+625
+#+end_src
+Hint: You may find it convenient to use compose from Exercise 1.42.
+
+** Solution
+*** Using compose
+**** iterative
+#+begin_src scheme
+(define (compose f g)
+  (lambda (x) (f (g x))))
+
+(define (repeated f n)
+  (define (iter i composed)
+    (if (= i n)
+        composed
+        (iter (inc i) (compose f composed))))
+  (iter 1 f))
+
+(test-equal 625 ((repeated square 2) 5))
+#+end_src
+
+**** recursive
+#+begin_src scheme
+(define (compose f g)
+  (lambda (x) (f (g x))))
+
+(define (repeated f n)
+  (if (= n 1)
+      f
+      (compose f (repeated f (dec n)))))
+
+(test-equal 625 ((repeated square 2) 5))
+#+end_src
+
+*** Not using compose
+**** iterative
+#+begin_src scheme
+(define (repeated f n)
+  (define (iter i result)
+    (if (= i n)
+        result
+        (iter (inc i) (f result))))
+  (lambda (x)
+    (iter 0 x)))
+
+(test-equal 625 ((repeated square 2) 5))
+#+end_src
+
+**** recursive
+#+begin_src scheme
+(define (repeated f n)
+  (lambda (x)
+    (define (recur n)
+      (if (= n 1)
+          (f x)
+          (f (recur (dec n)))))
+    (recur n)))
+
+(test-equal 625 ((repeated square 2) 5))
+#+end_src
+
 * meta                                                            :noexport:
 #+PROPERTY: header-args :results output
 #+OPTIONS: todo:nil toc:nil num:nil
