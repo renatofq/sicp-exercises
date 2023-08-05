@@ -4,6 +4,8 @@
 (define (dec n) (- n 1))
 (define (square x) (* x x))
 (define (cube x) (* x x x))
+(define (average x y)
+    (/ (+ x y) 2))
 
 ;; test functions
 (define (display-test-fail expected actual)
