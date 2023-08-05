@@ -179,7 +179,6 @@ The good-enough? test used in computing square roots will not be very effective 
 (test-approximate 100000.0 (sqrt 10000000000.0) 0.001)
 #+end_src
 
-
 * Exercise 1.8
 Newton’s method for cube roots is based on the fact that if y is an approximation to the cube root of x, then a better approximation is given by the value:
 
@@ -1733,7 +1732,7 @@ Several of the numerical methods described in this chapter are instances of an e
 (test-approximate 1.61803 (approximate-phi) 0.00001)
 #+end_src
 
-* meta                                                             :noexport:
+* meta :noexport:
 #+PROPERTY: header-args :results output
 #+OPTIONS: todo:nil toc:nil num:nil
 #+HTML_HEAD_EXTRA: <style> img { width: 100% }</style>
