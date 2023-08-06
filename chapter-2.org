@@ -1,0 +1,206 @@
+#+TITLE: Chapter 2 Exercises
+
+* Exercise 2.1
+Define a better version of make-rat that handles both positive and negative arguments. Make-rat should normalize the sign so that if the rational number is positive, both the numerator and denominator are positive, and if the rational number is negative, only the numerator is negative.
+
+** Solution
+#+begin_src scheme
+(define (make-rat n d)
+  (define (normalize-numerator-signal n d)
+  (if (< (* n d) 0)
+      (* (- 1) (abs n))
+      (abs n)))
+  (let* ((nsn (normalize-numerator-signal n d))
+        (nsd (abs d))
+        (gcd-of-n-and-d (abs (gcd nsn nsd))))
+    (cons
+     (/ nsn gcd-of-n-and-d)
+     (/ nsd gcd-of-n-and-d))))
+
+(test-equal 1     (numer (make-rat 1 3)))
+(test-equal (- 1) (numer (make-rat 1 (- 3))))
+(test-equal (- 1) (numer (make-rat (- 1) 3)))
+(test-equal 1     (numer (make-rat (- 1) (- 3))))
+
+(test-equal 3 (denom (make-rat 1 3)))
+(test-equal 3 (denom (make-rat 1 (- 3))))
+(test-equal 3 (denom (make-rat (- 1) 3)))
+(test-equal 3 (denom (make-rat (- 1) (- 3))))
+#+end_src
+
+* Exercise 2.2
+Consider the problem of representing line segments in a plane. Each segment is represented as a pair of points: a starting point and an ending point. Define a constructor make-segment and selectors start-segment and end-segment that define the representation of segments in terms of points. Furthermore, a point can be represented as a pair of numbers: the x coordinate and the y coordinate. Accordingly, specify a constructor make-point and selectors x-point and y-point that define this representation. Finally, using your selectors and constructors, define a procedure midpoint-segment that takes a line segment as argument and returns its midpoint (the point whose coordinates are the average of the coordinates of the endpoints). To try your procedures, you’ll need a way to print points:
+#+begin_src scheme :eval never
+(define (print-point p)
+  (newline)
+  (display "(")
+  (display (x-point p))
+  (display ",")
+  (display (y-point p))
+  (display ")"))
+#+end_src
+
+** Solution
+#+begin_src scheme
+;; point abstraction
+(define (make-point x y)
+  (cons x y))
+(define (x-point point)
+  (car point))
+(define (y-point point)
+  (cdr point))
+(define (print-point p)
+  (newline)
+  (display "(")
+  (display (x-point p))
+  (display ",")
+  (display (y-point p))
+  (display ")"))
+
+;; segment abstraction
+(define (make-segment start end)
+  (cons start end))
+(define (start-segment segment)
+  (car segment))
+(define (end-segment segment)
+  (cdr segment))
+(define (midpoint-segment segment)
+  (make-point
+   (average (x-point (start-segment segment))
+            (x-point (end-segment segment)))
+   (average (y-point (start-segment segment))
+            (y-point (end-segment segment)))))
+
+(print-point (midpoint-segment (make-segment (make-point 0 0)
+                                             (make-point 8 8))))
+#+end_src
+
+* Exercise 2.3
+Implement a representation for rectangles in a plane. (Hint: You may want to make use of Exercise 2.2.) In terms of your constructors and selectors, create procedures that compute the perimeter and the area of a given rectangle. Now implement a different representation for rectangles. Can you design your system with suitable abstraction barriers, so that the same perimeter and area procedures will work using either representation?
+
+** Solution
+*** Two point based rectangle
+#+begin_src scheme
+;; from 2.2
+(define (make-point x y)
+  (cons x y))
+(define (x-point point)
+  (car point))
+(define (y-point point)
+  (cdr point))
+
+;; constructor and selectors
+(define (make-rectangle a b)
+  (cons a b))
+(define (rectangle-height r)
+  (abs (-
+        (y-point (car r))
+        (y-point (cdr r)))))
+(define (rectangle-width r)
+  (abs (-
+        (x-point (car r))
+        (x-point (cdr r)))))
+
+;; area and perimeter
+(define (rectangle-area r)
+  (*
+   (rectangle-height r)
+   (rectangle-width r)))
+(define (rectangle-perimeter r)
+  (+
+   (* 2 (rectangle-height r))
+   (* 2 (rectangle-width r))))
+
+;; tests
+(define unitary-rectangle
+  (make-rectangle
+   (make-point 0 0)
+   (make-point 1 1)))
+
+(define phi 1.618033988749)
+(define golden-rectangle
+  (make-rectangle
+   (make-point 0 0)
+   (make-point 1 phi)))
+
+(test-equal 1 (rectangle-area unitary-rectangle))
+(test-equal 4 (rectangle-perimeter unitary-rectangle))
+
+(test-equal phi (rectangle-area golden-rectangle))
+(test-approximate
+    (+ 2 (* 2 phi))
+    (rectangle-perimeter golden-rectangle)
+    0.00000000001)
+#+end_src
+
+*** Point, width and height based rectangle
+#+begin_src scheme
+;; from 2.2
+(define (make-point x y)
+  (cons x y))
+(define (x-point point)
+  (car point))
+(define (y-point point)
+  (cdr point))
+
+;; constructor and selectors
+(define (make-rectangle a w h)
+  (cons a (cons w h)))
+(define (rectangle-width r)
+  (car (cdr r)))
+(define (rectangle-height r)
+  (cdr (cdr r)))
+
+;; area and perimeter. Same as before
+(define (rectangle-area r)
+  (*
+   (rectangle-height r)
+   (rectangle-width r)))
+(define (rectangle-perimeter r)
+  (+
+   (* 2 (rectangle-height r))
+   (* 2 (rectangle-width r))))
+
+;; tests
+(define unitary-rectangle
+  (make-rectangle (make-point 0 0) 1 1))
+
+(define phi 1.618033988749)
+(define golden-rectangle
+  (make-rectangle (make-point 0 0) 1 phi))
+
+(test-equal 1 (rectangle-area unitary-rectangle))
+(test-equal 4 (rectangle-perimeter unitary-rectangle))
+
+(test-equal phi (rectangle-area golden-rectangle))
+(test-approximate
+    (+ 2 (* 2 phi))
+    (rectangle-perimeter golden-rectangle)
+    0.00000000001)
+#+end_src
+
+* meta :noexport:
+#+PROPERTY: header-args :results output
+#+OPTIONS: todo:nil toc:nil num:nil
+# Local Variables:
+# eval: (olivetti-mode 1)
+# eval: (flyspell-mode 1)
+# ispell-local-dictionary: "american"
+# eval: (advice-add
+#        'org-babel-insert-result
+#        :filter-args
+#        (lambda (args)
+#          (let ((result (car args))
+#                (result-params (cadr args))
+#                (others (cddr args)))
+#            (apply 'list
+#                   result
+#                   (if (or
+#                        (string-empty-p result) (not result))
+#                       (progn (org-babel-remove-result) '("silent"))
+#                     result-params)
+#                   others))))
+# eval: (add-hook 'geiser-repl-startup-hook
+#        (lambda ()
+#          (geiser-load-file "chapter-2-defs.scm")))
+# End:
