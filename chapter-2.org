@@ -205,13 +205,13 @@ What is the corresponding definition of cdr? (Hint: To verify that this works, m
 #+end_src
 
 Substitution:
-#+begin_comment
+#+begin_example
 > (cdr (cons 1 2))
 > (cdr (lambda (m) (m 1 2)))
 > (((lambda (m) (m 1 2)) (lambda (p q) q)))
 > ((lambda (p q) q) 1 2)
-> 2
-#+end_comment
+$1 = 2
+#+end_example
 
 * Exercise 2.5
 Show that we can represent pairs of nonnegative integers using only numbers and arithmetic operations if we represent the pair $a$ and $b$ as the integer that is the product $2^a3^b$. Give the corresponding definitions of the procedures cons, car, and cdr.
@@ -277,6 +277,7 @@ Define one and two directly (not in terms of zero and add-1). (Hint: Use substit
 > (define two (lambda (f) (lambda (x) (f (f x)))))
 #+end_example
 
+
 #+begin_src scheme
 ;; Church's numerals are functions that receives a function f and returns
 ;; another function that receives x. is in the domain of f.
@@ -320,6 +321,44 @@ Define one and two directly (not in terms of zero and add-1). (Hint: Use substit
   (((+ two two) double) 1)) ;; double(double(double(double(1))))
 #+end_src
 
+* Exercise 2.17
+Define a procedure last-pair that returns the list that contains only the last element of a given (nonempty) list:
+#+begin_src scheme :eval never
+(last-pair (list 23 72 149 34))
+(34)
+#+end_src
+
+** Solution
+#+begin_src scheme
+(define (last-pair l)
+  (let ((next (cdr l)))
+    (if (null? next)
+        l
+        (last-pair next))))
+
+(test-equal (list 34) (last-pair (list 23 72 149 34)))
+#+end_src
+
+* Exercise 2.18
+Define a procedure reverse that takes a list as argument and returns a list of the same elements in reverse order:
+#+begin_src scheme :eval never
+(reverse (list 1 4 9 16 25))
+(25 16 9 4 1)
+#+end_src
+
+** Solution
+#+begin_src scheme
+(define (reverse l)
+  (define (iter l result)
+    (if (null? l)
+        result
+        (iter (cdr l) (cons (car l) result))))
+    (iter l nil))
+
+(test-equal
+  (list 25 16 9 4 1)
+  (reverse (list 1 4 9 16 25)))
+#+end_src
 
 * meta :noexport:
 #+PROPERTY: header-args :results output

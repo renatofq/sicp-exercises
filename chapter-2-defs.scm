@@ -1,4 +1,5 @@
 ;; math functions
+(define nil '())
 (define (identity a) a)
 (define (inc n) (+ n 1))
 (define (dec n) (- n 1))
@@ -30,7 +31,7 @@
 
 
 (define (test-equal expected actual)
-  (if (not (= expected actual))
+  (if (not (equal? expected actual))
       (display-test-fail expected actual)))
 
 (define (test-approximate expected actual error)
