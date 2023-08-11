@@ -24,9 +24,9 @@
   (display ";")
   (newline))
 
-(define (test-assert expected)
-  (if (not expected)
-      (display-test-fail expected actual)))
+(define (test-assert result)
+  (if (not result)
+      (display-test-fail #t result)))
 
 
 (define (test-equal expected actual)

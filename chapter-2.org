@@ -179,6 +179,148 @@ Implement a representation for rectangles in a plane. (Hint: You may want to mak
     0.00000000001)
 #+end_src
 
+* Exercise 2.4
+Here is an alternative procedural representation of pairs. For this representation, verify that (car (cons x y)) yields x for any objects x and y.
+#+begin_src scheme :eval never
+(define (cons x y)
+  (lambda (m) (m x y)))
+
+(define (car z)
+  (z (lambda (p q) p)))
+#+end_src
+What is the corresponding definition of cdr? (Hint: To verify that this works, make use of the substitution model of 1.1.5.)
+
+** Solution
+#+begin_src scheme
+;; from exercise formulation
+(define (cons x y)
+  (lambda (m) (m x y)))
+
+;; cdr
+(define (cdr z)
+  (z (lambda (p q) q)))
+
+;; test
+(test-equal 2 (cdr (cons 1 2)))
+#+end_src
+
+Substitution:
+#+begin_comment
+> (cdr (cons 1 2))
+> (cdr (lambda (m) (m 1 2)))
+> (((lambda (m) (m 1 2)) (lambda (p q) q)))
+> ((lambda (p q) q) 1 2)
+> 2
+#+end_comment
+
+* Exercise 2.5
+Show that we can represent pairs of nonnegative integers using only numbers and arithmetic operations if we represent the pair $a$ and $b$ as the integer that is the product $2^a3^b$. Give the corresponding definitions of the procedures cons, car, and cdr.
+
+** Solution
+#+begin_src scheme
+(define (cons a b)
+  (* (expt 2 a) (expt 3 b)))
+
+(define (factored-by factor n)
+    (define (iter n count)
+      (if (not (= (remainder n factor) 0))
+          count
+          (iter (/ n factor) (+ count 1))))
+    (iter n 0))
+
+(define (car pair)
+  (factored-by 2 pair))
+(define (cdr pair)
+  (factored-by 3 pair))
+
+(test-equal 1 (car 2))
+(test-equal 0 (cdr 2))
+(test-equal 0 (car 3))
+(test-equal 1 (cdr 3))
+
+(define n (cons 2 3))
+(test-equal 2 (car n))
+(test-equal 3 (cdr n))
+
+(define m (cons 4 4))
+(test-equal 4 (car m))
+(test-equal 4 (cdr m))
+#+end_src
+
+* Exercise 2.6
+In case representing pairs as procedures wasn’t mind-boggling enough, consider that, in a language that can manipulate procedures, we can get by without numbers (at least insofar as nonnegative integers are concerned) by implementing 0 and the operation of adding 1 as
+#+begin_src scheme :eval never
+(define zero (lambda (f) (lambda (x) x)))
+
+(define (add-1 n)
+  (lambda (f) (lambda (x) (f ((n f) x)))))
+#+end_src
+This representation is known as Church numerals, after its inventor, Alonzo Church, the logician who invented the λ-calculus.
+Define one and two directly (not in terms of zero and add-1). (Hint: Use substitution to evaluate (add-1 zero)). Give a direct definition of the addition procedure + (not in terms of repeated application of add-1).
+
+** Solution
+#+begin_example
+> (define one (add-1 zero))
+> (define one (add-1 (lambda (f) (lambda (x) x))))
+> (define one (lambda (f)
+                (lambda (x)
+                  (f (((lambda (f) (lambda (x) x)) f) x)))))
+> (define one (lambda (f) (lambda (x) (f ((lambda (x) x) x)))))
+> (define one (lambda (f) (lambda (x) (f x))))
+
+> (define two (add-1 one))
+> (define two (add-1 (lambda (f) (lambda (x) (f x)))))
+> (define two (lambda (f)
+                (lambda (x)
+                  (f (((lambda (f) (lambda (x) (f x))) f) x)))))
+> (define two (lambda (f) (lambda (x) (f ((lambda (x) (f x)) x)))))
+> (define two (lambda (f) (lambda (x) (f (f x)))))
+#+end_example
+
+#+begin_src scheme
+;; Church's numerals are functions that receives a function f and returns
+;; another function that receives x. is in the domain of f.
+;; The numeral zero is the function that maps f to the identity function.
+(define zero (lambda (f) (lambda (x) x)))
+
+;; add-1 is the function that maps a Church's numeral, n, to another
+;; numeral. It does so by composing f to the result of f applyed to n,
+;; applyed to x. f(n(f)(x)) in standard mathematical notation.
+;; By this definition, one and two are the following compositions, as
+;; shown above.
+(define one  (lambda (f) (lambda (x) (f x))))
+(define two  (lambda (f) (lambda (x) (f (f x)))))
+
+;; + is the function that maps two Church's numerals, n and m, to another
+;; Church's numeral. Therefore, it's result is a function that receives a
+;; function f and returns a function of x. This resulting fuction is
+;; computed by composing n(f), to the result of m(f)(x). This translates
+;; n(f)(m(f)(x)).
+;; Applying f m times and subsequentially f n times to it's result, is
+;; equivalent to applying f n+m times.
+(define (+ n m)
+  (lambda (f)
+    (lambda (x)
+      ((n f) ((m f) x)))))
+
+;; tests
+(test-equal 1 ((one inc) 0))                 ;; inc(0)
+(test-equal 1 (((+ one zero) inc) 0))        ;; inc(0)
+(test-equal 2 (((+ one one) inc) 0))         ;; inc(inc(0))
+
+(test-equal 2 ((two inc) 0))                 ;; inc(inc(0))
+(test-equal 2 (((+ two zero) inc) 0))        ;; inc(inc(0))
+(test-equal 3 (((+ two one) inc) 0))         ;; inc(inc(inc(0)))
+
+(test-equal 5 (((+ one (+ two two)) inc) 0)) ;; inc(inc(inc(inc(inc(0)))))
+
+(define (double n) (* 2 n))
+(test-equal
+    (expt 2 4)
+  (((+ two two) double) 1)) ;; double(double(double(double(1))))
+#+end_src
+
+
 * meta :noexport:
 #+PROPERTY: header-args :results output
 #+OPTIONS: todo:nil toc:nil num:nil
