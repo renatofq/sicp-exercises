@@ -217,6 +217,7 @@ $1 = 2
 Show that we can represent pairs of nonnegative integers using only numbers and arithmetic operations if we represent the pair $a$ and $b$ as the integer that is the product $2^a3^b$. Give the corresponding definitions of the procedures cons, car, and cdr.
 
 ** Solution
+*** TODO missing mathematical demonstration
 #+begin_src scheme
 (define (cons a b)
   (* (expt 2 a) (expt 3 b)))
@@ -288,16 +289,16 @@ Define one and two directly (not in terms of zero and add-1). (Hint: Use substit
 ;; numeral. It does so by composing f to the result of f applyed to n,
 ;; applyed to x. f(n(f)(x)) in standard mathematical notation.
 ;; By this definition, one and two are the following compositions, as
-;; shown above.
+;; shown before.
 (define one  (lambda (f) (lambda (x) (f x))))
 (define two  (lambda (f) (lambda (x) (f (f x)))))
 
-;; + is the function that maps two Church's numerals, n and m, to another
-;; Church's numeral. Therefore, it's result is a function that receives a
-;; function f and returns a function of x. This resulting fuction is
-;; computed by composing n(f), to the result of m(f)(x). This translates
+;; + is the function that maps two Church's numerals, n and m, to another.
+;; Therefore, its result is a function that receives a function f and
+;; returns a function of x. This resulting fuction is computed by
+;; composing n(f), to the result of m(f)(x). This translates to
 ;; n(f)(m(f)(x)).
-;; Applying f m times and subsequentially f n times to it's result, is
+;; Applying f m times and subsequentially f n times to its result, is
 ;; equivalent to applying f n+m times.
 (define (+ n m)
   (lambda (f)
@@ -320,6 +321,8 @@ Define one and two directly (not in terms of zero and add-1). (Hint: Use substit
     (expt 2 4)
   (((+ two two) double) 1)) ;; double(double(double(double(1))))
 #+end_src
+
+* Exercises 2.7 to 2.16
 
 * Exercise 2.17
 Define a procedure last-pair that returns the list that contains only the last element of a given (nonempty) list:
@@ -349,16 +352,242 @@ Define a procedure reverse that takes a list as argument and returns a list of t
 ** Solution
 #+begin_src scheme
 (define (reverse l)
-  (define (iter l result)
+  (define (reverse-iter l result)
     (if (null? l)
         result
-        (iter (cdr l) (cons (car l) result))))
-    (iter l nil))
+        (reverse-iter (cdr l) (cons (car l) result))))
+  (reverse-iter l nil))
 
 (test-equal
   (list 25 16 9 4 1)
   (reverse (list 1 4 9 16 25)))
 #+end_src
+
+* Exercise 2.19
+Consider the change-counting program of 1.2.2. It would be nice to be able to easily change the currency used by the program, so that we could compute the number of ways to change a British pound, for example. As the program is written, the knowledge of the currency is distributed partly into the procedure first-denomination and partly into the procedure count-change (which knows that there are five kinds of U.S. coins). It would be nicer to be able to supply a list of coins to be used for making change.
+We want to rewrite the procedure cc so that its second argument is a list of the values of the coins to use rather than an integer specifying which coins to use. We could then have lists that defined each kind of currency:
+#+begin_src scheme :eval never
+(define us-coins
+  (list 50 25 10 5 1))
+(define uk-coins
+  (list 100 50 20 10 5 2 1 0.5))
+#+end_src
+We could then call cc as follows:
+#+begin_src scheme :eval never
+(cc 100 us-coins)
+292
+#+end_src
+To do this will require changing the program cc somewhat. It will still have the same form, but it will access its second argument differently, as follows:
+#+begin_src scheme :eval never
+(define (cc amount coin-values)
+  (cond ((= amount 0)
+         1)
+        ((or (< amount 0)
+             (no-more? coin-values))
+         0)
+        (else
+         (+ (cc
+             amount
+             (except-first-denomination
+              coin-values))
+            (cc
+             (- amount
+                (first-denomination
+                 coin-values))
+             coin-values)))))
+#+end_src
+Define the procedures first-denomination, except-first-denomination and no-more? in terms of primitive operations on list structures. Does the order of the list coin-values affect the answer produced by cc? Why or why not?
+
+** Solution
+The order of coin-values does not affect the answer because the procedure does the calculation trying every combination possible for the coins in the list.
+
+#+begin_src scheme
+(define (first-denomination coin-values)
+  (car coin-values))
+(define (except-first-denomination coin-values)
+  (cdr coin-values))
+(define (no-more? coin-values)
+  (null? coin-values))
+
+;; Tests
+(define us-coins
+  (list 50 25 10 5 1))
+(define uk-coins
+  (list 100 50 20 10 5 2 1 0.5))
+(define (cc amount coin-values)
+  (cond ((= amount 0)
+         1)
+        ((or (< amount 0)
+             (no-more? coin-values))
+         0)
+        (else
+         (+ (cc
+             amount
+             (except-first-denomination
+              coin-values))
+            (cc
+             (- amount
+                (first-denomination
+                 coin-values))
+             coin-values)))))
+
+(test-equal 292 (cc 100 us-coins))
+(test-equal 104561 (cc 100 uk-coins))
+#+end_src
+
+* Exercise 2.20
+The procedures +, *, and list take arbitrary numbers of arguments. One way to define such procedures is to use define with dotted-tail notation. In a procedure definition, a parameter list that has a dot before the last parameter name indicates that, when the procedure is called, the initial parameters (if any) will have as values the initial arguments, as usual, but the final parameter’s value will be a list of any remaining arguments. For instance, given the definition
+#+begin_src scheme :eval never
+(define (f x y . z) ⟨body⟩)
+#+end_src
+the procedure f can be called with two or more arguments. If we evaluate
+#+begin_src scheme :eval never
+(f 1 2 3 4 5 6)
+#+end_src
+then in the body of f, x will be 1, y will be 2, and z will be the list (3 4 5 6). Given the definition
+#+begin_src scheme :eval never
+(define (g . w) ⟨body⟩)
+#+end_src
+the procedure g can be called with zero or more arguments. If we evaluate
+#+begin_src scheme :eval never
+(g 1 2 3 4 5 6)
+#+end_src
+then in the body of g, w will be the list (1 2 3 4 5 6).
+
+Use this notation to write a procedure same-parity that takes one or more integers and returns a list of all the arguments that have the same even-odd parity as the first argument. For example,
+#+begin_src scheme :eval never
+(same-parity 1 2 3 4 5 6 7)
+(1 3 5 7)
+
+(same-parity 2 3 4 5 6 7)
+(2 4 6)
+#+end_src
+
+** Solution
+#+begin_src scheme
+(define (same-parity . l)
+  (define desired-paridity?    ;; not using let to avoid some parens
+    (if (even? (car l))
+        even?
+        odd?))
+  (define (recur l)
+    (cond ((null? l)
+           nil)
+          ((desired-paridity? (car l))
+           (cons (car l) (recur (cdr l))))
+          (else
+           (recur (cdr l)))))
+  (recur l))
+
+(test-equal
+  (list 1 3 5 7)
+  (same-parity 1 2 3 4 5 6 7))
+(test-equal
+  (list 2 4 6)
+  (same-parity 2 3 4 5 6 7))
+#+end_src
+
+* Exercise 2.21
+The procedure square-list takes a list of numbers as argument and returns a list of the squares of those numbers.
+#+begin_src scheme :eval never
+(square-list (list 1 2 3 4))
+(1 4 9 16)
+#+end_src
+Here are two different definitions of square-list. Complete both of them by filling in the missing expressions:
+#+begin_src scheme :eval never
+(define (square-list items)
+  (if (null? items)
+      nil
+      (cons ⟨??⟩ ⟨??⟩)))
+
+(define (square-list items)
+  (map ⟨??⟩ ⟨??⟩))
+#+end_src
+
+** Solution
+#+begin_src scheme
+(define (square-list items)
+  (if (null? items)
+      nil
+      (cons (square (car items)) (square-list (cdr items)))))
+
+(test-equal (list 1 4 9 16)
+  (square-list (list 1 2 3 4)))
+
+(define (square-list items)
+  (map square items))
+
+(test-equal (list 1 4 9 16)
+  (square-list (list 1 2 3 4)))
+#+end_src
+
+* Exercise 2.22
+Louis Reasoner tries to rewrite the first square-list procedure of Exercise 2.21 so that it evolves an iterative process:
+#+begin_src scheme :eval never
+(define (square-list items)
+  (define (iter things answer)
+    (if (null? things)
+        answer
+        (iter (cdr things)
+              (cons (square (car things))
+                    answer))))
+  (iter items nil))
+#+end_src
+Unfortunately, defining square-list this way produces the answer list in the reverse order of the one desired. Why?
+
+Louis then tries to fix his bug by interchanging the arguments to cons:
+#+begin_src scheme :eval never
+(define (square-list items)
+  (define (iter things answer)
+    (if (null? things)
+        answer
+        (iter (cdr things)
+              (cons answer
+                    (square
+                     (car things))))))
+  (iter items nil))
+#+end_src
+This doesn’t work either. Explain.
+
+** Solution
+I've made the same mistakes in previous exercises. The first attempt does not work because at first iteration it add the result to answer, which is empty, next he adds the result to the first position of answer and so on, reversing the results. The next attempt builds a structure in the form
+((((() . 1) . 4) . 9) . 16)
+that is not the expected list structure
+(1 . (4 . ( 9 . (16 . ())))).
+
+* Exercise 2.23
+The procedure for-each is similar to map. It takes as arguments a procedure and a list of elements. However, rather than forming a list of the results, for-each just applies the procedure to each of the elements in turn, from left to right. The values returned by applying the procedure to the elements are not used at all—for-each is used with procedures that perform an action, such as printing. For example,
+#+begin_src scheme :eval never
+(for-each
+ (lambda (x) (newline) (display x))
+ (list 57 321 88))
+
+57
+321
+88
+#+end_src
+
+The value returned by the call to for-each (not illustrated above) can be something arbitrary, such as true. Give an implementation of for-each.
+
+** Solution
+#+begin_src scheme
+(define (for-each fn ls)
+  (if (null? ls)
+      nil
+      (let ()
+        (fn (car ls))           ;; discarding this value is a side effect?
+        (for-each fn (cdr ls)))))
+
+(for-each
+ (lambda (x) (newline) (display x))
+ (list 57 321 88))
+#+end_src
+
+#+RESULTS:
+: 
+: 57
+: 321
+: 88
 
 * meta :noexport:
 #+PROPERTY: header-args :results output
