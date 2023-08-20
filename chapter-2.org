@@ -567,11 +567,32 @@ The value returned by the call to for-each (not illustrated above) can be someth
  (list 57 321 88))
 #+end_src
 
-#+RESULTS:
-: 
-: 57
-: 321
-: 88
+Output
+#+begin_example
+57
+321
+88
+#+end_example
+
+* Exercise 2.24
+Suppose we evaluate the expression (list 1 (list 2 (list 3 4))). Give the result printed by the interpreter, the corresponding box-and-pointer structure, and the interpretation of this as a tree (as in Figure 2.6).
+
+** Solution
+Printed representation:
+#+begin_example
+(1 (2 (3 4)))
+#+end_example
+
+Pair structure:
+#+begin_example
+(1 . ((2 . ((3 . (4 . ())) . ())) . ()))
+#+end_example
+
+Box-and-Pointer representation:
+[[./2_24-boxes.png]]
+
+Tree representation:
+#+INCLUDE: "2_24-tree-graph.dot" src dot :file 2_24-tree-graph.png
 
 * meta :noexport:
 #+PROPERTY: header-args :results output

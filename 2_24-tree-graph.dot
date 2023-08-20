@@ -1,0 +1,19 @@
+digraph {
+  /* root */
+  r[label="(1 (2 (3 4)))"];
+
+  /* depth 1 */
+  re[label="1"];
+  rd[label="(2 (3 4))"];
+  r -> {re rd};
+
+  /* depth 2 */
+  rde[label="2"];
+  rdd[label="(3 4)"];
+  rd -> {rde rdd};
+
+  /* depth 3 */
+  rdde[label="3"];
+  rddd[label="4"];
+  rdd -> {rdde rddd};
+}
