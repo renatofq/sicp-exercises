@@ -1756,5 +1756,5 @@ Several of the numerical methods described in this chapter are instances of an e
 #                   others))))
 # eval: (add-hook 'geiser-repl-startup-hook
 #        (lambda ()
-#          (geiser-load-file "chapter-1-defs.scm")))
+#          (geiser-load-file "defs.scm")))
 # End:

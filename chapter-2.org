@@ -16,6 +16,9 @@ Define a better version of make-rat that handles both positive and negative argu
     (cons
      (/ nsn gcd-of-n-and-d)
      (/ nsd gcd-of-n-and-d))))
+(define (numer x) (car x))
+(define (denom x) (cdr x))
+
 
 (test-equal 1     (numer (make-rat 1 3)))
 (test-equal (- 1) (numer (make-rat 1 (- 3))))
@@ -683,6 +686,40 @@ x
   (deep-reverse '(4 (3 2) (1))))
 #+end_src
 
+* Exercise 2.28
+Write a procedure fringe that takes as argument a tree (represented as a list) and returns a list whose elements are all the leaves of the tree arranged in left-to-right order. For example,
+#+begin_src scheme :eval never
+(define x
+  (list (list 1 2) (list 3 4)))
+
+(fringe x)
+(1 2 3 4)
+
+(fringe (list x x))
+(1 2 3 4 1 2 3 4)
+#+end_src
+
+** Solution
+#+begin_src scheme
+(define (fringe tree)
+  (cond
+   ((null? tree)
+    nil)
+   ((not (pair? tree))
+    (list tree))
+   (else
+    (append (fringe (car tree)) (fringe (cdr tree))))))
+
+(define x
+  (list (list 1 2) (list 3 4)))
+
+(test-equal '(1 2 3 4)
+  (fringe x))
+
+(test-equal '(1 2 3 4 1 2 3 4)
+  (fringe (list x x)))
+#+end_src
+
 * meta :noexport:
 #+PROPERTY: header-args :results output
 #+OPTIONS: todo:nil toc:nil num:nil
@@ -706,5 +743,5 @@ x
 #                   others))))
 # eval: (add-hook 'geiser-repl-startup-hook
 #        (lambda ()
-#          (geiser-load-file "chapter-2-defs.scm")))
+#          (geiser-load-file "defs.scm")))
 # End:
