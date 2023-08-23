@@ -702,13 +702,11 @@ Write a procedure fringe that takes as argument a tree (represented as a list) a
 ** Solution
 #+begin_src scheme
 (define (fringe tree)
-  (cond
-   ((null? tree)
-    nil)
-   ((not (pair? tree))
-    (list tree))
-   (else
-    (append (fringe (car tree)) (fringe (cdr tree))))))
+  (define (iter tree result)
+    (if (not (pair? tree))
+        (cons tree result)
+        (iter (car tree) (iter (car (cdr tree)) result))))
+  (iter tree nil))
 
 (define x
   (list (list 1 2) (list 3 4)))
