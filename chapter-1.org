@@ -1737,8 +1737,8 @@ Several of the numerical methods described in this chapter are instances of an e
 #+OPTIONS: todo:nil toc:nil num:nil
 #+HTML_HEAD_EXTRA: <style> img { width: 100% }</style>
 # Local Variables:
-# eval: (olivetti-mode 1)
 # eval: (flyspell-mode 1)
+# eval: (olivetti-mode 1)
 # ispell-local-dictionary: "american"
 # eval: (advice-add
 #        'org-babel-insert-result

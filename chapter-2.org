@@ -405,6 +405,24 @@ Define the procedures first-denomination, except-first-denomination and no-more?
 The order of coin-values does not affect the answer because the procedure does the calculation trying every combination possible for the coins in the list.
 
 #+begin_src scheme
+;; from problem
+(define (cc amount coin-values)
+  (cond ((= amount 0)
+         1)
+        ((or (< amount 0)
+             (no-more? coin-values))
+         0)
+        (else
+         (+ (cc
+             amount
+             (except-first-denomination
+              coin-values))
+            (cc
+             (- amount
+                (first-denomination
+                 coin-values))
+             coin-values)))))
+
 (define (first-denomination coin-values)
   (car coin-values))
 (define (except-first-denomination coin-values)
@@ -562,13 +580,19 @@ The value returned by the call to for-each (not illustrated above) can be someth
   (if (null? ls)
       nil
       (let ()
-        (fn (car ls))           ;; discarding this value is a side effect?
+        (fn (car ls))       ;; discarding this value is a side effect
         (for-each fn (cdr ls)))))
 
 (for-each
  (lambda (x) (newline) (display x))
  (list 57 321 88))
 #+end_src
+
+#+RESULTS:
+: 
+: 57
+: 321
+: 88
 
 Output
 #+begin_example
@@ -715,12 +739,109 @@ Write a procedure fringe that takes as argument a tree (represented as a list) a
   (fringe (list x x)))
 #+end_src
 
+* Exercise 2.29
+A binary mobile consists of two branches, a left branch and a right branch. Each branch is a rod of a certain length, from which hangs either a weight or another binary mobile. We can represent a binary mobile using compound data by constructing it from two branches (for example, using list):
+
+#+begin_src scheme :eval never
+(define (make-mobile left right)
+  (list left right))
+#+end_src
+
+A branch is constructed from a length (which must be a number) together with a structure, which may be either a number (representing a simple weight) or another mobile:
+
+#+begin_src scheme :eval never
+(define (make-branch length structure)
+  (list length structure))
+#+end_src
+
+1. Write the corresponding selectors left-branch and right-branch, which return the branches of a mobile, and branch-length and branch-structure, which return the components of a branch.
+2. Using your selectors, define a procedure total-weight that returns the total weight of a mobile.
+3. A mobile is said to be balanced if the torque applied by its top-left branch is equal to that applied by its top-right branch (that is, if the length of the left rod multiplied by the weight hanging from that rod is equal to the corresponding product for the right side) and if each of the submobiles hanging off its branches is balanced. Design a predicate that tests whether a binary mobile is balanced.
+4. Suppose we change the representation of mobiles so that the constructors are
+#+begin_src scheme :eval never
+(define (make-mobile left right)
+  (cons left right))
+
+(define (make-branch length structure)
+  (cons length structure))
+#+end_src
+How much do you need to change your programs to convert to the new representation?
+
+** Solution
+#+begin_src scheme
+;; from the problem definition
+(define (make-mobile left right)
+  (list left right))
+(define (make-branch length structure)
+  (list length structure))
+
+;; actual solution
+;; 1
+(define (left-branch mobile)
+  (car mobile))
+(define (right-branch mobile)
+  (car (cdr mobile)))
+
+(define (branch-lenght branch)
+  (car branch))
+(define (branch-structure branch)
+  (car (cdr branch)))
+
+;; 2
+(define (is-terminal? structure)
+  (number? structure))
+
+(define (branch-weight branch)
+  (let ((structure (branch-structure branch)))
+    (if (is-terminal? structure)
+        structure
+        (total-weight structure))))
+
+(define (total-weight mobile)
+  (+ (branch-weight (left-branch mobile))
+     (branch-weight (right-branch mobile))))
+
+;; 3
+(define (torque-applied branch)
+  (* (branch-lenght branch)
+     (branch-weight branch)))
+
+(define (balanced? mobile)
+  (= (torque-applied (left-branch mobile))
+     (torque-applied (right-branch mobile))))
+
+(define (fully-balanced? structure)
+  (cond ((is-terminal? structure) #t)
+        ((not (balanced? structure)) #f)
+        (else
+         (and (fully-balanced? (branch-structure
+                                (left-branch structure)))
+              (fully-balanced? (branch-structure
+                                (right-branch structure)))))))
+
+(define my-mobile
+  (make-mobile
+   (make-branch 0.1 200)
+   (make-branch 0.1 (make-mobile
+                     (make-branch 0.02 (make-mobile
+                                        (make-branch 0.05 25)
+                                        (make-branch 0.01 125)))
+                     (make-branch 0.06 50)))))
+
+(test-equal 400 (total-weight my-mobile))
+(test-assert (fully-balanced? my-mobile))
+
+;; 4
+;; Is just a matter of removing the car procedure from right-branch and
+;; branch-structure
+#+end_src
+
 * meta :noexport:
 #+PROPERTY: header-args :results output
 #+OPTIONS: todo:nil toc:nil num:nil
 # Local Variables:
-# eval: (olivetti-mode 1)
 # eval: (flyspell-mode 1)
+# eval: (olivetti-mode 1)
 # ispell-local-dictionary: "american"
 # eval: (advice-add
 #        'org-babel-insert-result
