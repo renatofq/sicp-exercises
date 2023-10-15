@@ -7,6 +7,14 @@
 (define (average x y)
   (/ (+ x y) 2))
 
+(define (accumulate op initial sequence)
+  (if (null? sequence)
+      initial
+      (op (car sequence)
+          (accumulate op
+                      initial
+                      (cdr sequence)))))
+
 ;; test functions
 (define (display-test-fail expected actual)
   (display "fail! expected: ")
