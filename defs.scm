@@ -1,5 +1,4 @@
-;; math functions
-(define nil '())
+;; Chapter 1
 (define (inc n) (+ n 1))
 (define (dec n) (- n 1))
 (define (square x) (* x x))
@@ -7,6 +6,8 @@
 (define (average x y)
   (/ (+ x y) 2))
 
+;; Chapter 2
+(define nil '())
 (define (accumulate op initial sequence)
   (if (null? sequence)
       initial
@@ -14,6 +15,14 @@
           (accumulate op
                       initial
                       (cdr sequence)))))
+(define fold-right accumulate)
+(define (fold-left op initial sequence)
+  (define (iter result rest)
+    (if (null? rest)
+        result
+        (iter (op result (car rest))
+              (cdr rest))))
+  (iter initial sequence))
 
 ;; test functions
 (define (display-test-fail expected actual)
