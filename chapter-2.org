@@ -1051,7 +1051,7 @@ Suppose we represent vectors $v = (v_i)$ as sequences of numbers, and matrices $
 
 is represented as the sequence ((1 2 3 4) (4 5 6 6) (6 7 8 9)). With this representation, we can use sequence operations to concisely express the basic matrix and vector operations. These operations (which are described in any book on matrix algebra) are the following:
 
-#+ATTR_HTML: :frame none 
+#+ATTR_HTML: :frame none
 | (dot-product v w)     | returns the sum $\sum_i v_iw_i$;      |
 | (matrix-*-vector m v) | returns the vector $t$,               |
 |                       | where $t_i = \sum_j m_{ij}v_j$;       |
@@ -1170,6 +1170,125 @@ Complete the following definitions of reverse (Exercise 2.18) in terms of fold-r
 
 (test-equal '(6 5 4)
   (reverse '(4 5 6)))
+#+end_src
+
+* Exercise 2.40
+Define a procedure unique-pairs that, given an integer $n$, generates the sequence of pairs $(i,j)$ with $1 \leq j < i \leq n$. Use unique-pairs to simplify the definition of prime-sum-pairs given above.
+
+** Solution
+#+begin_src scheme
+(define (unique-pairs n)
+  (flatmap (lambda (i)
+             (map (lambda (j)
+                    (list i j))
+                  (enumerate-interval 1 (- i 1))))
+           (enumerate-interval 1 n)))
+
+(define (prime-sum-pairs n)
+  (map make-pair-sum
+       (filter
+        prime-sum?
+        (unique-pairs n))))
+#+end_src
+
+* Exercise 2.41
+Write a procedure to find all ordered triples of distinct positive integers $i$, $j$, and $k$ less than or equal to a given integer $n$ that sum to a given integer $s$.
+
+** Solution
+#+begin_src scheme
+(define (triplet-sum t)
+  (+ (car t) (cadr t) (caddr t)))
+
+(define (unique-pairs n)
+  (flatmap (lambda (i)
+             (map (lambda (j) (list i j))
+                  (enumerate-interval 1 (- i 1))))
+           (enumerate-interval 1 n)))
+
+(define (unique-triplets n)
+  (flatmap (lambda (i)
+             (map (lambda (p) (cons i p))
+                  (unique-pairs (- i 1))))
+           (enumerate-interval 1 n)))
+
+(define (unique-triplets-whose-sum-is s n)
+  (filter (lambda (t)
+            (= s (triplet-sum t)))
+          (unique-triplets n)))
+#+end_src
+
+* Exercise 2.42
+The “eight-queens puzzle” asks how to place eight queens on a chessboard so that no queen is in check from any other (i.e., no two queens are in the same row, column, or diagonal). One possible solution is shown in Figure 2.8. One way to solve the puzzle is to work across the board, placing a queen in each column. Once we have placed k−1 queens, we must place the kth queen in a position where it does not check any of the queens already on the board. We can formulate this approach recursively: Assume that we have already generated the sequence of all possible ways to place k−1queens in the first k−1 columns of the board. For each of these ways, generate an extended set of positions by placing a queen in each row of the kth column. Now filter these, keeping only the positions for which the queen in the kth column is safe with respect to the other queens. This produces the sequence of all ways to place k queens in the first k columns. By continuing this process, we will produce not only one solution, but all solutions to the puzzle.
+
+\[
+
+\]
+
+We implement this solution as a procedure queens, which returns a sequence of all solutions to the problem of placing n queens on an n×n chessboard. Queens has an internal procedure queen-cols
+that returns the sequence of all ways to place queens in the first k columns of the board.
+
+#+begin_src scheme :eval never
+(define (queens board-size)
+  (define (queen-cols k)
+    (if (= k 0)
+        (list empty-board)
+        (filter
+         (lambda (positions)
+           (safe? k positions))
+         (flatmap
+          (lambda (rest-of-queens)
+            (map (lambda (new-row)
+                   (adjoin-position
+                    new-row
+                    k
+                    rest-of-queens))
+                 (enumerate-interval
+                  1
+                  board-size)))
+          (queen-cols (- k 1))))))
+  (queen-cols board-size))
+#+end_src
+
+In this procedure rest-of-queens is a way to place k−1 queens in the first k−1 columns, and new-row is a proposed row in which to place the queen for the kth column. Complete the program by implementing the representation for sets of board positions, including the procedure adjoin-position, which adjoins a new row-column position to a set of positions, and empty-board, which represents an empty set of positions. You must also write the procedure safe?, which determines for a set of positions, whether the queen in the kth column is safe with respect to the others. (Note that we need only check whether the new queen is safe—the other queens are already guaranteed safe with respect to each other.)
+
+** Solution
+#+begin_src scheme
+(define empty-board
+  '())
+
+(define (adjoin-position new-row k rest-of-queens)
+  (cons (cons k new-row) rest-of-queens))
+
+(define (queen-check? queen k r)
+  (let ((queen-k (car queen))
+        (queen-r (cdr queen)))
+    (or (= r queen-r)
+        (= (- k queen-k) (abs (- r queen-r))))))
+
+(define (safe? k positions)
+  (define r (cdar positions))
+  (define (safe-iter rest)
+    (cond ((nil? rest) #t)
+          ((queen-check? (car rest) k r) #f)
+          (else (safe-iter (cdr rest)))))
+  (safe-iter (cdr positions)))
+
+(define (queens board-size)
+  (define (queen-cols k)
+    (if (= k 0)
+        (list empty-board)
+        (filter (lambda (positions)
+                  (safe? k positions))
+                (flatmap (lambda (rest-of-queens)
+                           (map (lambda (new-row)
+                                  (adjoin-position new-row
+                                                   k
+                                                   rest-of-queens))
+                                (enumerate-interval 1 board-size)))
+                         (queen-cols (- k 1))))))
+  (queen-cols board-size))
+
+(test-equal 92 (length (queens 8)))
 #+end_src
 
 * meta :noexport:
