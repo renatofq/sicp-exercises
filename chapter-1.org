@@ -1731,30 +1731,3 @@ Several of the numerical methods described in this chapter are instances of an e
 
 (test-approximate 1.61803 (approximate-phi) 0.00001)
 #+end_src
-
-* meta :noexport:
-#+PROPERTY: header-args :results output
-#+OPTIONS: todo:nil toc:nil num:nil
-#+HTML_HEAD_EXTRA: <style> img { width: 100% }</style>
-# Local Variables:
-# eval: (flyspell-mode 1)
-# eval: (olivetti-mode 1)
-# ispell-local-dictionary: "american"
-# eval: (advice-add
-#        'org-babel-insert-result
-#        :filter-args
-#        (lambda (args)
-#          (let ((result (car args))
-#                (result-params (cadr args))
-#                (others (cddr args)))
-#            (apply 'list
-#                   result
-#                   (if (or
-#                        (string-empty-p result) (not result))
-#                       (progn (org-babel-remove-result) '("silent"))
-#                     result-params)
-#                   others))))
-# eval: (add-hook 'geiser-repl-startup-hook
-#        (lambda ()
-#          (geiser-load-file "defs.scm")))
-# End:

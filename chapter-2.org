@@ -1290,29 +1290,3 @@ In this procedure rest-of-queens is a way to place kâˆ’1 queens in the first kâˆ
 
 (test-equal 92 (length (queens 8)))
 #+end_src
-
-* meta :noexport:
-#+PROPERTY: header-args :results output
-#+OPTIONS: todo:nil toc:nil num:nil
-# Local Variables:
-# eval: (flyspell-mode 1)
-# eval: (olivetti-mode 1)
-# ispell-local-dictionary: "american"
-# eval: (advice-add
-#        'org-babel-insert-result
-#        :filter-args
-#        (lambda (args)
-#          (let ((result (car args))
-#                (result-params (cadr args))
-#                (others (cddr args)))
-#            (apply 'list
-#                   result
-#                   (if (or
-#                        (string-empty-p result) (not result))
-#                       (progn (org-babel-remove-result) '("silent"))
-#                     result-params)
-#                   others))))
-# eval: (add-hook 'geiser-repl-startup-hook
-#        (lambda ()
-#          (geiser-load-file "defs.scm")))
-# End:
