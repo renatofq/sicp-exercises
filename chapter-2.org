@@ -32,7 +32,7 @@ Define a better version of make-rat that handles both positive and negative argu
 #+end_src
 
 * Exercise 2.2
-Consider the problem of representing line segments in a plane. Each segment is represented as a pair of points: a starting point and an ending point. Define a constructor make-segment and selectors start-segment and end-segment that define the representation of segments in terms of points. Furthermore, a point can be represented as a pair of numbers: the x coordinate and the y coordinate. Accordingly, specify a constructor make-point and selectors x-point and y-point that define this representation. Finally, using your selectors and constructors, define a procedure midpoint-segment that takes a line segment as argument and returns its midpoint (the point whose coordinates are the average of the coordinates of the endpoints). To try your procedures, you’ll need a way to print points:
+Consider the problem of representing line segments in a plane. Each segment is represented as a pair of points: a starting point and an ending point. Define a constructor make-segment and selectors start-segment and end-segment that define the representation of segments in terms of points. Furthermore, a point can be represented as a pair of numbers: the x coordinate and the y coordinate. Accordingly, specify a constructor make-point and selectors x-point and y-point that define this representation. Finally, using your selectors and constructors, define a procedure midpoint-segment that takes a line segment as argument and returns its midpoint (the point whose coordinates are the average of the coordinates of the endpoints). To try your procedures, you'll need a way to print points:
 #+begin_src scheme :eval never
 (define (print-point p)
   (newline)
@@ -252,7 +252,7 @@ Show that we can represent pairs of nonnegative integers using only numbers and 
 #+end_src
 
 * Exercise 2.6
-In case representing pairs as procedures wasn’t mind-boggling enough, consider that, in a language that can manipulate procedures, we can get by without numbers (at least insofar as nonnegative integers are concerned) by implementing 0 and the operation of adding 1 as
+In case representing pairs as procedures wasn't mind-boggling enough, consider that, in a language that can manipulate procedures, we can get by without numbers (at least insofar as nonnegative integers are concerned) by implementing 0 and the operation of adding 1 as
 #+begin_src scheme :eval never
 (define zero (lambda (f) (lambda (x) x)))
 
@@ -441,9 +441,9 @@ The order of coin-values does not affect the answer because the procedure does t
 #+end_src
 
 * Exercise 2.20
-The procedures +, *, and list take arbitrary numbers of arguments. One way to define such procedures is to use define with dotted-tail notation. In a procedure definition, a parameter list that has a dot before the last parameter name indicates that, when the procedure is called, the initial parameters (if any) will have as values the initial arguments, as usual, but the final parameter’s value will be a list of any remaining arguments. For instance, given the definition
+The procedures +, *, and list take arbitrary numbers of arguments. One way to define such procedures is to use define with dotted-tail notation. In a procedure definition, a parameter list that has a dot before the last parameter name indicates that, when the procedure is called, the initial parameters (if any) will have as values the initial arguments, as usual, but the final parameter's value will be a list of any remaining arguments. For instance, given the definition
 #+begin_src scheme :eval never
-(define (f x y . z) ⟨body⟩)
+(define (f x y . z) <body>)
 #+end_src
 the procedure f can be called with two or more arguments. If we evaluate
 #+begin_src scheme :eval never
@@ -451,7 +451,7 @@ the procedure f can be called with two or more arguments. If we evaluate
 #+end_src
 then in the body of f, x will be 1, y will be 2, and z will be the list (3 4 5 6). Given the definition
 #+begin_src scheme :eval never
-(define (g . w) ⟨body⟩)
+(define (g . w) <body>)
 #+end_src
 the procedure g can be called with zero or more arguments. If we evaluate
 #+begin_src scheme :eval never
@@ -503,10 +503,10 @@ Here are two different definitions of square-list. Complete both of them by fill
 (define (square-list items)
   (if (null? items)
       nil
-      (cons ⟨??⟩ ⟨??⟩)))
+      (cons <??> <??>)))
 
 (define (square-list items)
-  (map ⟨??⟩ ⟨??⟩))
+  (map <??> <??>))
 #+end_src
 
 ** Solution
@@ -552,7 +552,7 @@ Louis then tries to fix his bug by interchanging the arguments to cons:
                      (car things))))))
   (iter items nil))
 #+end_src
-This doesn’t work either. Explain.
+This doesn't work either. Explain.
 
 ** Solution
 I've made the same mistakes in previous exercises. The first attempt does not work because at first iteration it add the result to answer, which is empty, next he adds the result to the first position of answer and so on, reversing the results. The next attempt builds a structure in the form
@@ -899,7 +899,7 @@ We can represent a set as a list of distinct elements, and we can represent the 
   (if (null? s)
       (list nil)
       (let ((rest (subsets (cdr s))))
-        (append rest (map ⟨??⟩ rest)))))
+        (append rest (map <??> rest)))))
 #+end_src
 
 ** Solution
@@ -922,14 +922,14 @@ Fill in the missing expressions to complete the following definitions of some ba
 
 #+begin_src scheme :eval never
 (define (map p sequence)
-  (accumulate (lambda (x y) ⟨??⟩)
+  (accumulate (lambda (x y) <??>)
               nil sequence))
 
 (define (append seq1 seq2)
-  (accumulate cons ⟨??⟩ ⟨??⟩))
+  (accumulate cons <??> <??>))
 
 (define (length sequence)
-  (accumulate ⟨??⟩ 0 sequence))
+  (accumulate <??> 0 sequence))
 #+end_src
 
 ** Solution
@@ -958,21 +958,21 @@ Fill in the missing expressions to complete the following definitions of some ba
 * Exercise 2.34
 Evaluating a polynomial in $x$ at a given value of $x$ can be formulated as an accumulation. We evaluate the polynomial
 \[
-a_n x^n + a_{n−1}x^{n−1} + \cdots +a_1x + a_0
+a_n x^n + a_{n-1}x^{n-1} + \cdots +a_1x + a_0
 \]
-using a well-known algorithm called Horner’s rule, which structures the computation as
+using a well-known algorithm called Horner's rule, which structures the computation as
 \[
-(\cdots(a_nx + a_{n−1})x + \cdots +a_1)x + a_0.
+(\cdots(a_nx + a_{n-1})x + \cdots +a_1)x + a_0.
 \]
-In other words, we start with $a_n$, multiply by $x$, add $a_{n−1}$, multiply by $x$, and so on, until we reach $a_0$.
+In other words, we start with $a_n$, multiply by $x$, add $a_{n-1}$, multiply by $x$, and so on, until we reach $a_0$.
 
-Fill in the following template to produce a procedure that evaluates a polynomial using Horner’s rule. Assume that the coefficients of the polynomial are arranged in a sequence, from $a_0$ through
+Fill in the following template to produce a procedure that evaluates a polynomial using Horner's rule. Assume that the coefficients of the polynomial are arranged in a sequence, from $a_0$ through
 
 #+begin_src scheme :eval never
 (define (horner-eval x coefficient-sequence)
   (accumulate
    (lambda (this-coeff higher-terms)
-     ⟨??⟩)
+     <??>)
    0
    coefficient-sequence))
 #+end_src
@@ -999,7 +999,7 @@ For example, to compute $1+3x+5x^3+x^5$ at $x=2$ you would evaluate
 Redefine count-leaves from 2.2.2 as an accumulation:
 #+begin_src scheme :eval never
 (define (count-leaves t)
-  (accumulate ⟨??⟩ ⟨??⟩ (map ⟨??⟩ ⟨??⟩)))
+  (accumulate <??> <??> (map <??> <??>)))
 #+end_src
 
 ** Solution
@@ -1024,8 +1024,8 @@ The procedure accumulate-n is similar to accumulate except that it takes as its 
 (define (accumulate-n op init seqs)
   (if (null? (car seqs))
       nil
-      (cons (accumulate op init ⟨??⟩)
-            (accumulate-n op init ⟨??⟩))))
+      (cons (accumulate op init <??>)
+            (accumulate-n op init <??>))))
 #+end_src
 
 ** Solution
@@ -1041,7 +1041,7 @@ The procedure accumulate-n is similar to accumulate except that it takes as its 
 #+end_src
 
 * Exercise 2.37
-Suppose we represent vectors $v = (v_i)$ as sequences of numbers, and matrices $m = (m_{ij})$ as sequences of vectors (the rows of the matrix). For example, the matrix
+Suppose we represent vectors $v=(v_i)$ as sequences of numbers, and matrices $m=(m_{ij})$ as sequences of vectors (the rows of the matrix). For example, the matrix
 
 \begin{pmatrix}
 1 & 2 & 3 & 4 \\
@@ -1071,14 +1071,14 @@ Fill in the missing expressions in the following procedures for computing the ot
 
 #+begin_src scheme :eval never
 (define (matrix-*-vector m v)
-  (map ⟨??⟩ m))
+  (map <??> m))
 
 (define (transpose mat)
-  (accumulate-n ⟨??⟩ ⟨??⟩ mat))
+  (accumulate-n <??> <??> mat))
 
 (define (matrix-*-matrix m n)
   (let ((cols (transpose n)))
-    (map ⟨??⟩ m)))
+    (map <??> m)))
 #+end_src
 
 ** Solution
@@ -1148,11 +1148,11 @@ Complete the following definitions of reverse (Exercise 2.18) in terms of fold-r
 #+begin_src scheme :eval never
 (define (reverse sequence)
   (fold-right
-   (lambda (x y) ⟨??⟩) nil sequence))
+   (lambda (x y) <??>) nil sequence))
 
 (define (reverse sequence)
   (fold-left
-   (lambda (x y) ⟨??⟩) nil sequence))
+   (lambda (x y) <??>) nil sequence))
 #+end_src
 
 ** Solution
@@ -1173,7 +1173,7 @@ Complete the following definitions of reverse (Exercise 2.18) in terms of fold-r
 #+end_src
 
 * Exercise 2.40
-Define a procedure unique-pairs that, given an integer $n$, generates the sequence of pairs $(i,j)$ with $1 \leq j < i \leq n$. Use unique-pairs to simplify the definition of prime-sum-pairs given above.
+Define a procedure unique-pairs that, given an integer $n$, generates the sequence of pairs $(i,j)$ with $1 \leq j \lt i \leq n$. Use unique-pairs to simplify the definition of prime-sum-pairs given above.
 
 ** Solution
 #+begin_src scheme
@@ -1218,14 +1218,17 @@ Write a procedure to find all ordered triples of distinct positive integers $i$,
 #+end_src
 
 * Exercise 2.42
-The “eight-queens puzzle” asks how to place eight queens on a chessboard so that no queen is in check from any other (i.e., no two queens are in the same row, column, or diagonal). One possible solution is shown in Figure 2.8. One way to solve the puzzle is to work across the board, placing a queen in each column. Once we have placed k−1 queens, we must place the kth queen in a position where it does not check any of the queens already on the board. We can formulate this approach recursively: Assume that we have already generated the sequence of all possible ways to place k−1queens in the first k−1 columns of the board. For each of these ways, generate an extended set of positions by placing a queen in each row of the kth column. Now filter these, keeping only the positions for which the queen in the kth column is safe with respect to the other queens. This produces the sequence of all ways to place k queens in the first k columns. By continuing this process, we will produce not only one solution, but all solutions to the puzzle.
+The “eight-queens puzzle” asks how to place eight queens on a chessboard so that no queen is in check from any other (i.e., no two queens are in the same row, column, or diagonal). One possible solution is shown in Figure 2.8. One way to solve the puzzle is to work across the board, placing a queen in each column. Once we have placed $k-1$ queens, we must place the $k^{th}$ queen in a position where it does not check any of the queens already on the board. We can formulate this approach recursively: Assume that we have already generated the sequence of all possible ways to place $k-1$ queens in the first $k-1$ columns of the board. For each of these ways, generate an extended set of positions by placing a queen in each row of the $k^{th}$ column. Now filter these, keeping only the positions for which the queen in the $k^{th}$ column is safe with respect to the other queens. This produces the sequence of all ways to place $k$ queens in the first $k$ columns. By continuing this process, we will produce not only one solution, but all solutions to the puzzle.
 
-\[
 
-\]
+#+property: header-args:latex+ :headers '("\\usepackage{chessboard}") :border 1pt
+\chessboard[
+  showmover=false,
+  setfen=5q2/2q5/q7/6q1/4q3/7q/1q6/3q4 b - - 0 0]
 
-We implement this solution as a procedure queens, which returns a sequence of all solutions to the problem of placing n queens on an n×n chessboard. Queens has an internal procedure queen-cols
-that returns the sequence of all ways to place queens in the first k columns of the board.
+
+We implement this solution as a procedure queens, which returns a sequence of all solutions to the problem of placing n queens on an $n \times n$ chessboard. Queens has an internal procedure queen-cols
+that returns the sequence of all ways to place queens in the first $k$ columns of the board.
 
 #+begin_src scheme :eval never
 (define (queens board-size)
@@ -1249,7 +1252,7 @@ that returns the sequence of all ways to place queens in the first k columns of 
   (queen-cols board-size))
 #+end_src
 
-In this procedure rest-of-queens is a way to place k−1 queens in the first k−1 columns, and new-row is a proposed row in which to place the queen for the kth column. Complete the program by implementing the representation for sets of board positions, including the procedure adjoin-position, which adjoins a new row-column position to a set of positions, and empty-board, which represents an empty set of positions. You must also write the procedure safe?, which determines for a set of positions, whether the queen in the kth column is safe with respect to the others. (Note that we need only check whether the new queen is safe—the other queens are already guaranteed safe with respect to each other.)
+In this procedure rest-of-queens is a way to place $k-1$ queens in the first $k-1$ columns, and new-row is a proposed row in which to place the queen for the $k^{th}$ column. Complete the program by implementing the representation for sets of board positions, including the procedure adjoin-position, which adjoins a new row-column position to a set of positions, and empty-board, which represents an empty set of positions. You must also write the procedure safe?, which determines for a set of positions, whether the queen in the $k^{th}$ column is safe with respect to the others. (Note that we need only check whether the new queen is safe—the other queens are already guaranteed safe with respect to each other.)
 
 ** Solution
 #+begin_src scheme
