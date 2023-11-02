@@ -1043,11 +1043,11 @@ The procedure accumulate-n is similar to accumulate except that it takes as its 
 * Exercise 2.37
 Suppose we represent vectors $v=(v_i)$ as sequences of numbers, and matrices $m=(m_{ij})$ as sequences of vectors (the rows of the matrix). For example, the matrix
 
-\begin{pmatrix}
+\[\begin{pmatrix}
 1 & 2 & 3 & 4 \\
 4 & 5 & 6 & 6 \\
 6 & 7 & 8 & 9
-\end{pmatrix}
+\end{pmatrix}\]
 
 is represented as the sequence ((1 2 3 4) (4 5 6 6) (6 7 8 9)). With this representation, we can use sequence operations to concisely express the basic matrix and vector operations. These operations (which are described in any book on matrix algebra) are the following:
 
@@ -1173,7 +1173,7 @@ Complete the following definitions of reverse (Exercise 2.18) in terms of fold-r
 #+end_src
 
 * Exercise 2.40
-Define a procedure unique-pairs that, given an integer $n$, generates the sequence of pairs $(i,j)$ with $1 \leq j \lt i \leq n$. Use unique-pairs to simplify the definition of prime-sum-pairs given above.
+Define a procedure unique-pairs that, given an integer $n$, generates the sequence of pairs $(i,j)$ with $1 \leq j < i \leq n$. Use unique-pairs to simplify the definition of prime-sum-pairs given above.
 
 ** Solution
 #+begin_src scheme
@@ -1220,12 +1220,10 @@ Write a procedure to find all ordered triples of distinct positive integers $i$,
 * Exercise 2.42
 The “eight-queens puzzle” asks how to place eight queens on a chessboard so that no queen is in check from any other (i.e., no two queens are in the same row, column, or diagonal). One possible solution is shown in Figure 2.8. One way to solve the puzzle is to work across the board, placing a queen in each column. Once we have placed $k-1$ queens, we must place the $k^{th}$ queen in a position where it does not check any of the queens already on the board. We can formulate this approach recursively: Assume that we have already generated the sequence of all possible ways to place $k-1$ queens in the first $k-1$ columns of the board. For each of these ways, generate an extended set of positions by placing a queen in each row of the $k^{th}$ column. Now filter these, keeping only the positions for which the queen in the $k^{th}$ column is safe with respect to the other queens. This produces the sequence of all ways to place $k$ queens in the first $k$ columns. By continuing this process, we will produce not only one solution, but all solutions to the puzzle.
 
-
-#+property: header-args:latex+ :headers '("\\usepackage{chessboard}") :border 1pt
+#+LATEX_HEADER: \usepackage{chessboard}
 \chessboard[
   showmover=false,
   setfen=5q2/2q5/q7/6q1/4q3/7q/1q6/3q4 b - - 0 0]
-
 
 We implement this solution as a procedure queens, which returns a sequence of all solutions to the problem of placing n queens on an $n \times n$ chessboard. Queens has an internal procedure queen-cols
 that returns the sequence of all ways to place queens in the first $k$ columns of the board.
