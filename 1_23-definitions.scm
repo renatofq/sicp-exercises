@@ -1,6 +1,3 @@
-(define (runtime)
-  (get-internal-run-time))
-
 (define (smallest-divisor n)
   (if (divides? 2 n)
       2
@@ -14,9 +11,6 @@
         (else (find-uneven-divisor
                n
                (+ test-divisor 2)))))
-
-(define (divides? a b)
-  (= (remainder b a) 0))
 
 (define (prime? n)
   (= n (smallest-divisor n)))

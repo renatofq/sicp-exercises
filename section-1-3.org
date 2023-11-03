@@ -164,7 +164,6 @@ You can obtain an even more general version of accumulate (Exercise 1.32) by int
 
 ** Solution
 #+begin_src scheme
-(load-from-path "1_33-definitions.scm")
 (define (filtered-accumulate predicate combiner null-value term a next b)
   (define (evaluate-result result value)
     (if (not (predicate value))
