@@ -1,0 +1,59 @@
+#+TITLE: Section 2.3 Exercises
+
+* Exercise 2.53
+What would the interpreter print in response to evaluating each of the following expressions?
+#+begin_src scheme :eval never
+(list 'a 'b 'c)
+(list (list 'george))
+(cdr '((x1 x2) (y1 y2)))
+(cadr '((x1 x2) (y1 y2)))
+(pair? (car '(a short list)))
+(memq 'red '((red shoes) (blue socks)))
+(memq 'red '(red shoes blue socks))
+#+end_src
+
+#+begin_example
+$1 = (a b)
+$2 = ((george))
+$3 = ((y1 y2))
+$4 = (y1 y1)
+$5 = #f
+$6 = #f
+$7 = (red shoes blue socks)
+#+end_example
+
+* Exercise 2.54
+Two lists are said to be equal? if they contain equal elements arranged in the same order. For example,
+#+begin_src scheme :eval never
+(equal? '(this is a list)
+        '(this is a list))
+#+end_src
+is true, but
+#+begin_src scheme :eval never
+(equal? '(this is a list)
+        '(this (is a) list))
+#+end_src
+is false. To be more precise, we can define equal? recursively in terms of the basic eq? equality of symbols by saying that a and b are equal? if they are both symbols and the symbols are eq?, or if they are both lists such that (car a) is equal? to (car b) and (cdr a) is equal? to (cdr b). Using this idea, implement equal? as a procedure.
+
+** Solution
+#+begin_src scheme
+(define (equal? a b)
+  (cond ((eq? a b) #t)
+        ((not (and (pair? a) (pair? b))) #f)
+        (else
+         (and (equal? (car a) (car b))
+              (equal? (cdr a) (cdr b))))))
+
+(test-assert (equal? '(this (is (pretty certaily) a) list)
+                    '(this (is (pretty certaily) a) list)))
+#+end_src
+
+* Exercise 2.55
+Eva Lu Ator types to the interpreter the expression
+#+begin_src scheme :eval never
+(car ''abracadabra)
+#+end_src
+To her surprise, the interpreter prints back quote. Explain.
+
+** Solution
+The first quote mark is equivalent to the function quote. Thus The expression "''abracadabra" is equivalent to "(quote (quote abracadabra))", which can be read as: a list with the symbols quote and abracadabra.
