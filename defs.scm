@@ -54,6 +54,9 @@
       nil
       (cons low (enumerate-interval (+ low 1) high))))
 
+(define (=number? a n)
+  (and (number? a) (number? n) (= a n)))
+
 ;; test functions
 (define (display-test-fail expected actual)
   (display "fail! expected: ")
@@ -75,3 +78,4 @@
   (if (< error
          (abs (- expected actual)))
       (display-test-fail expected actual)))
+
