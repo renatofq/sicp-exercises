@@ -1,0 +1,124 @@
+#+TITLE: 2.3 Example: Representing Sets
+
+* Exercise 2.59
+Implement the union-set operation for the unordered-list representation of sets.
+
+** Solution
+#+begin_src scheme
+;; From the book
+(define (element-of-set? x set)
+  (cond ((null? set) false)
+        ((equal? x (car set)) true)
+        (else (element-of-set? x (cdr set)))))
+
+(define (adjoin-set x set)
+  (if (element-of-set? x set)
+      set
+      (cons x set)))
+
+;; Actual solution
+(define (union-set set-a set-b)
+  (if (null? set-b)
+      set-a
+      (union-set (adjoin-set (car set-b) set-a) (cdr set-b))))
+
+;; Test
+(define one-to-four (union-set '(4 2) '(1 2 3)))
+
+(test-assert (element-of-set? 1 one-to-four))
+(test-assert (element-of-set? 2 one-to-four))
+(test-assert (element-of-set? 3 one-to-four))
+(test-assert (element-of-set? 4 one-to-four))
+(test-equal 4 (count one-to-four))
+
+(test-equal 0 (count (union-set nil nil)))
+
+#+end_src
+
+* Exercise 2.60
+We specified that a set would be represented as a list with no duplicates. Now suppose we allow duplicates. For instance, the set {1, 2, 3} could be represented as the list (2 3 2 1 3 2 2). Design procedures element-of-set?, adjoin-set, union-set, and intersection-set that operate on this representation. How does the efficiency of each compare with the corresponding procedure for the non-duplicate representation? Are there applications for which you would use this representation in preference to the non-duplicate one?
+
+** Solution
+#+begin_src scheme
+;; Same as before O(n)
+(define (element-of-set? x set)
+  (cond ((null? set) false)
+        ((equal? x (car set)) true)
+        (else (element-of-set? x (cdr set)))))
+
+;; does not check fo duplicity O(1)
+(define (adjoin-set x set)
+  (cons x set))
+
+;; does not check for duplicity O(n)
+(define (union-set set-a set-b)
+  (if (null? set-b)
+      set-a
+      (union-set (adjoin-set (car set-b) set-a) (cdr set-b))))
+
+;; same as before O(n^2)
+(define (intersection-set set-a set-b)
+  (cond ((or (null? set-a) (null? set-b))
+         '())
+        ((element-of-set? (car set-a) set-b)
+         (cons (car set-a)
+               (intersection-set (cdr set-a) set-b)))
+        (else
+         (intersection-set (cdr set-a) set-b))))
+#+end_src
+
+* Exercise 2.61
+Give an implementation of adjoin-set using the ordered representation. By analogy with element-of-set? show how to take advantage of the ordering to produce a procedure that requires on the average about half as many steps as with the unordered representation.
+
+** Solution
+#+begin_src scheme
+(define (adjoin-set x set)
+  (cond ((null? set)
+         (cons x set))
+        ((= x (car set))
+         set)
+        ((< x (car set))
+         (cons x set))
+        (else
+         (cons (car set) (adjoin-set x (cdr set))))))
+
+(test-equal '(1 2 3 4)
+  (adjoin-set 3 '(1 2 4)))
+(test-equal '(1 2 3 4)
+  (adjoin-set 3 '(1 2 3 4)))
+(test-equal '(1 2 3 4)
+  (adjoin-set 4 '(1 2 3)))
+(test-equal '(1 2 3 4)
+  (adjoin-set 1 '(2 3 4)))
+#+end_src
+
+* Exercise 2.62
+Give a O(n) implementation of union-set for sets represented as ordered lists.
+
+** Solution
+#+begin_src scheme
+(define (union-set set-a set-b)
+  (cond ((null? set-b) set-a)
+        ((null? set-a) set-b)
+        (else
+         (let ((x-a (car set-a))
+               (x-b (car set-b)))
+           (cond ((= x-a x-b)
+                  (cons x-a (union-set (cdr set-a) (cdr set-b))))
+                 ((< x-a x-b)
+                  (cons x-a (union-set (cdr set-a) set-b)))
+                 (else
+                  (cons x-b (union-set set-a (cdr set-b)))))))))
+
+(test-equal '()
+  (union-set '() '()))
+
+(test-equal '(1 2 3 4)
+  (union-set '(1 2 3 4) '()))
+
+(test-equal '(1 2 3 4)
+  (union-set '() '(1 2 3 4)))
+
+(test-equal '(1 2 3 4)
+  (union-set '(1 2 4) '(1 2 3)))
+#+end_src

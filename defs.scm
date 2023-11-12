@@ -2,6 +2,10 @@
 (define (runtime)
   (get-internal-run-time))
 
+(define nil '())
+(define true #t)
+(define false #f)
+
 ;; Chapter 1
 (define (inc n) (+ n 1))
 (define (dec n) (- n 1))
@@ -29,7 +33,6 @@
 
 
 ;; Chapter 2
-(define nil '())
 (define (accumulate op initial sequence)
   (if (null? sequence)
       initial
@@ -56,6 +59,13 @@
 
 (define (=number? a n)
   (and (number? a) (number? n) (= a n)))
+
+(define (count list)
+  (define (iter n list)
+    (if (null? list)
+        n
+        (iter (inc n) (cdr list))))
+  (iter 0 list))
 
 ;; test functions
 (define (display-test-fail expected actual)
