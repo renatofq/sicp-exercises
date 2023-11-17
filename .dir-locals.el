@@ -2,7 +2,7 @@
               (mode . olivetti)
               (ispell-local-dictionary . "american")
               (org-export-with-toc . nil)
-              (org-export-with-todo-keywords . nil)
+              ;; (org-export-with-todo-keywords . nil)
               (org-export-with-section-numbers . nil)
               (org-global-properties . ((header-args . ":results output")))
               (eval . (add-hook 'geiser-repl-startup-hook
