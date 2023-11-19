@@ -1,3 +1,63 @@
 #+TITLE: 2.2 Example: Picture Language
 
-* TODO
+* TODO Exercise 2.44
+Define the procedure up-split used by corner-split.  It is similar to right-split, except that it switches the roles of below and beside.
+
+* TODO Exercise 2.45
+Right-split and up-split can be expressed as instances of a general splitting operation. Define a procedure split with the property that evaluating
+
+#+begin_src scheme :eval never
+(define right-split (split beside below))
+(define up-split (split below beside))
+#+end_src
+
+produces procedures right-split and up-split with the same behaviors as the ones already defined.
+
+* TODO Exercise 2.46
+A two-dimensional vector $v$ running from the origin to a point can be represented as a pair consisting of an x-coordinate and a y-coordinate.  Implement a data abstraction for vectors by giving a constructor make-vect and corresponding selectors xcor-vect and ycor-vect.  In terms of your selectors and constructor, implement procedures add-vect, sub-vect, and scale-vect that perform the operations vector addition, vector subtraction, and multiplying a vector by a scalar:
+
+\[ (x_1,y_1) + (x_2,y_2) = (x_1 + x_2, y_1 + y_2), \]
+\[ (x_1, y_1) − (x_2, y_2) = (x1 − x2, y1 − y2), \]
+\[ s \cdot (x, y) = (sx, sy). \]
+
+* TODO Exercise 2.47
+Here are two possible constructors for frames:
+
+#+begin_src scheme :eval never
+(define (make-frame origin edge1 edge2)
+  (list origin edge1 edge2))
+
+(define (make-frame origin edge1 edge2)
+  (cons origin (cons edge1 edge2)))
+#+end_src
+
+For each constructor supply the appropriate selectors to produce an implementation for frames.
+
+* TODO Exercise 2.48
+directed line segment in the plane can be represented as a pair of vectors—the vector running from the origin to the start-point of the segment, and the vector running from the origin to the end-point of the segment.  Use your vector representation from Exercise 2.46 to define a representation for segments with a constructor make-segment and selectors start-segment and end-segment.
+
+* TODO Exercise 2.49
+Use segments->painter to define the following primitive painters:
+
+1. The painter that draws the outline of the designated frame.
+
+2. The painter that draws an “X” by connecting opposite corners of the frame.
+
+3. The painter that draws a diamond shape by connecting the midpoints of the sides of the frame.
+
+4. The wave painter.
+
+* TODO Exercise 2.50
+Define the transformation flip-horiz, which flips painters horizontally, and transformations that rotate painters counterclockwise by 180 degrees and 270 degrees.
+
+* TODO Exercise 2.51
+Define the below operation for painters.  Below takes two painters as arguments.  The resulting painter, given a frame, draws with the first painter in the bottom of the frame and with the second painter in the top.  Define below in two different ways—first by writing a procedure that is analogous to the beside procedure given above, and again in terms of beside and suitable rotation operations (from Exercise 2.50).
+
+* TODO Exercise 2.52
+Make changes to the square limit of wave shown in Figure 2.9 by working at each of the levels described above.  In particular:
+
+1. Add some segments to the primitive wave painter of Exercise 2.49 (to add a smile, for example).
+
+2. Change the pattern constructed by corner-split (for example, by using only one copy of the up-split and right-split images instead of two).
+
+3. Modify the version of square-limit that uses square-of-four so as to assemble the corners in a different pattern.  (For example, you might make the big Mr. Rogers look outward from each corner of the square.)
