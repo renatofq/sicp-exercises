@@ -25,19 +25,25 @@
 
 ;; tagged data
 (define (attach-tag type-tag contents)
-  (cons type-tag contents))
+  (if (eq? type-tag 'scheme-number)
+      contents
+      (cons type-tag contents)))
 
 (define (type-tag datum)
-  (if (pair? datum)
-      (car datum)
-      (error "Bad tagged datum:
-              TYPE-TAG" datum)))
+  (cond ((number? datum) 'scheme-number)
+        ((pair? datum)
+         (car datum))
+        (else
+         (error "Bad tagged datum: TYPE-TAG"
+                datum))))
 
 (define (contents datum)
-  (if (pair? datum)
-      (cdr datum)
-      (error "Bad tagged datum:
-              CONTENTS" datum)))
+  (cond ((number? datum) datum)
+        ((pair? datum)
+         (cdr datum))
+        (else
+         (error "Bad tagged datum: CONTENTS"
+                datum))))
 
 ;; generic operations
 (define (apply-generic op . args)
@@ -109,9 +115,9 @@
   (put 'make 'rational
        (lambda (n d) (tag (make-rat n d))))
   (put 'numerator '(rational)
-       (lambda (x) (attach-tag 'scheme-number (numer x))))
+       (lambda (x) (numer x)))
   (put 'denominator '(rational)
-       (lambda (x) (attach-tag 'scheme-number (denom x))))
+       (lambda (x) (denom x)))
   'done)
 
 (define (make-rational n d)
@@ -248,9 +254,53 @@
 (define (angle z)
   (apply-generic 'angle z))
 
+;; equality package
+(define (install-equality-package)
+  (put 'equ?
+       '(scheme-number scheme-number)
+       (lambda (x y)
+         (= x y)))
+  (put 'equ?
+       '(rational rational)
+       (lambda (x y)
+         (and (= (numerator x) (numerator y))
+              (= (denominator x) (denominator y)))))
+  (put 'equ?
+       '(complex complex)
+       (lambda (x y)
+         (and (= (real-part x) (real-part y))
+              (= (imag-part x) (imag-part y)))))
+  'done)
+
+(define (equ? x y)
+  (apply-generic 'equ? x y))
+
+;; zero predicate package
+(define (install-zero-predicate-package)
+  (put '=zero?
+       '(scheme-number)
+       (lambda (x)
+         (= 0 x)))
+  (put '=zero?
+       '(rational)
+       (lambda (x)
+         (and (= 0 (numerator x))
+              (not (= 0 (denominator x))))))
+  (put '=zero?
+       '(complex)
+       (lambda (x)
+         (and (= 0 (real-part x))
+              (= 0 (imag-part x)))))
+  'done)
+
+(define (=zero? x)
+  (apply-generic '=zero? x))
+
 ;; install packages
 (install-scheme-number-package)
 (install-rational-package)
 (install-rectangular-package)
 (install-polar-package)
 (install-complex-package)
+(install-equality-package)
+(install-zero-predicate-package)
