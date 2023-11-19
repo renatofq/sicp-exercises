@@ -1,4 +1,4 @@
-;; basic math
+;; dependencies
 (define (square x) (* x x))
 
 ;; put/get
@@ -284,8 +284,7 @@
   (put '=zero?
        '(rational)
        (lambda (x)
-         (and (= 0 (numerator x))
-              (not (= 0 (denominator x))))))
+         (= 0 (numerator x))))
   (put '=zero?
        '(complex)
        (lambda (x)
