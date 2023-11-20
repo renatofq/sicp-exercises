@@ -1,4 +1,4 @@
-#+TITLE: Section 2.2 Exercises
+#+title: Section 2.2 Exercises
 
 * Exercise 2.17
 Define a procedure last-pair that returns the list that contains only the last element of a given (nonempty) list:
@@ -283,10 +283,10 @@ Pair structure:
 #+end_example
 
 Box-and-Pointer representation:
-[[./2_24-boxes.png]]
+[[file:annex/2_24-boxes.png]]
 
 Tree representation:
-#+INCLUDE: "2_24-tree-graph.dot" src dot :file 2_24-tree-graph.png
+#+INCLUDE: "annex/2_24-tree-graph.dot" src dot :file annex/2_24-tree-graph.png
 
 * Exercise 2.25
 Give combinations of cars and cdrs that will pick 7 from each of the following lists:
