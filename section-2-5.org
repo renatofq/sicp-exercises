@@ -98,7 +98,7 @@ Define a generic predicate =zero? that tests if its argument is zero, and instal
   (apply-generic '=zero? x))
 #+end_src
 
-* TODO Exercise 2.81
+* Exercise 2.81
 Louis Reasoner has noticed that apply-generic may try to coerce the arguments to each other’s type even if they already have the same type.  Therefore, he reasons, we need to put procedures in the coercion table to coerce arguments of each type to their own type.  For example, in addition to the scheme-number->complex coercion shown above, he would do:
 
 #+begin_src scheme :eval never
@@ -136,5 +136,155 @@ What happens if we call exp with two complex numbers as arguments?
 
 3. Modify apply-generic so that it doesn’t try coercion if the two arguments have the same type.
 
-* TODO Exercise 2.82
+** Solution
+A.1: It will get into an infinite recursion because it will always find a coercion but never an operation.
+
+A.2: No. It works just as intended.
+
+3.A:
+#+begin_src scheme
+(define (apply-generic op . args)
+  (define (type-error)
+    (error "No method for these types"
+           (list op (map type-tag args))))
+  (let ((type-tags (map type-tag args)))
+    (let ((proc (get op type-tags)))
+      (if proc
+          (apply proc (map contents args))
+          (if (= (length args) 2)
+              (let ((type1 (car type-tags))
+                    (type2 (cadr type-tags))
+                    (a1 (car args))
+                    (a2 (cadr args)))
+                (if (not (eq? type1 type2))
+                    (let ((t1->t2 (get-coercion type1 type2))
+                          (t2->t1 (get-coercion type2 type1)))
+                      (cond (t1->t2
+                             (apply-generic op (t1->t2 a1) a2))
+                            (t2->t1
+                             (apply-generic op a1 (t2->t1 a2)))
+                            (else
+                             (type-error))))
+                    (type-error)))
+              (type-error))))))
+#+end_src
+
+* Exercise 2.82
 Show how to generalize apply-generic to handle coercion in the general case of multiple arguments.  One strategy is to attempt to coerce all the arguments to the type of the first argument, then to the type of the second argument, and so on. Give an example of a situation where this strategy (and likewise the two-argument version given above) is not sufficiently general.  (Hint: Consider the case where there are some suitable mixed-type operations present in the table that will not be tried.)
+
+** Solution
+#+begin_src scheme
+(define (coerce target-type args)
+  (map (lambda (arg)
+         (let ((arg-type (type-tag arg)))
+           (if (eq? target-type arg-type)
+               arg
+               (let ((coercion (get-coercion arg-type target-type)))
+                 (if coercion
+                     (coercion arg)
+                     arg)))))
+       args))
+
+;; prevents duplicate coercions
+(define (make-type-set type-tags)
+  (define (adjoin set type)
+    (cond ((null? set)
+           (cons type '()))
+          ((eq? type (car set))
+           set)
+        (else
+         (cons (car set) (adjoin type (cdr set))))))
+  (fold-left adjoin
+             '()
+             type-tags))
+
+(define (apply-generic op . args)
+  (define type-tags (map type-tag args))
+  (define (helper type-set actual-args)
+    (let ((proc (get op (map type-tag actual-args))))
+      (if proc
+          (apply proc (map contents actual-args))
+          (if (null? type-set)
+              (error "No method for these types: "
+                     (list op type-tags))
+              (helper (cdr type-set)
+                      (coerce (car type-set) args))))))
+  (helper (make-type-set type-tags) args))
+
+#+end_src
+
+* Exercise 2.83
+Suppose you are designing a generic arithmetic system for dealing with the tower of types shown in Figure 2.25: integer, rational, real, complex.  For each type (except complex), design a procedure that raises objects of that type one level in the tower.  Show how to install a generic raise operation that will work for each type (except complex).
+
+** Solution
+#+begin_src scheme
+(define (install-raise-package)
+  (define (integer->rational num)
+    (make-rational num 1))
+  (define (rational->real num)
+    (make-real (/ (car num) (cdr num))))
+  (define (real->complex num)
+    (make-complex-from-real-imag num 0))
+  ;;
+  (put 'raise '(integer) integer->rational)
+  (put 'raise '(rational) rational->real)
+  (put 'raise '(real) real->complex))
+
+(define (raise x)
+  (apply-generic 'raise x))
+#+end_src
+
+* Exercise 2.84
+Using the raise operation of Exercise 2.83, modify the apply-generic procedure so that it coerces its arguments to have the same type by the method of successive raising, as discussed in this section.  You will need to devise a way to test which of two types is higher in the tower.  Do this in a manner that is "compatible" with the rest of the system and will not lead to problems in adding new levels to the tower.
+
+** Solution
+#+begin_src scheme
+(define (sublist head ls)
+  (if (or (null? ls)
+          (eq? head (car ls)))
+      ls
+      (sublist head (cdr ls))))
+
+(define (maximum greater? ls)
+  (define (iter result ls)
+    (if (null? ls)
+        result
+        (let ((head (car ls))
+              (rest (cdr ls)))
+          (if (greater? head result)
+              (iter head rest)
+              (iter result rest)))))
+  (if (null? ls)
+      '()
+      (iter (car ls) (cdr ls))))
+
+(define (higher-type? t1 t2)
+  (let ((t2-tower (sublist t2 '(integer rational real complex))))
+    (and (pair? t2-tower)
+         (pair? (sublist t1 (cdr t2-tower))))))
+
+(define (raise-all-to target args)
+  (define (raise-while-target-is-higher arg)
+    (if (higher-type? target (type-tag arg))
+        (raise-while-target-is-higher (raise arg))
+        arg))
+  (map raise-while-target-is-higher args))
+
+(define (level-up args)
+  (raise-all-to
+   (maximum higher-type? (map type-tag args))
+   args))
+
+(define (apply-generic op . args)
+  (define (apply-generic-helper op args)
+    (let ((type-tags (map type-tag args)))
+      (let ((proc (get op type-tags)))
+        (if proc
+            (apply proc (map contents args))
+            (let ((raised (level-up args)))
+              (if (equal? raised args)
+                  (error "No method for these types: "
+                         (list op type-tags))
+                  (apply-generic-helper op raised)))))))
+  (apply-generic-ls op args))
+#+end_src
