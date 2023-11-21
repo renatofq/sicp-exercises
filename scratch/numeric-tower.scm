@@ -101,7 +101,7 @@
                   (error "No method for these types: "
                          (list op type-tags))
                   (apply-generic-helper op raised)))))))
-  (apply-generic-ls op args))
+  (apply-generic-helper op args))
 
 ;; generic operations --------------------------------------------------
 (define (add x y) (apply-generic 'add x y))

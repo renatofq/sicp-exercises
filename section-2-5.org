@@ -286,5 +286,5 @@ Using the raise operation of Exercise 2.83, modify the apply-generic procedure s
                   (error "No method for these types: "
                          (list op type-tags))
                   (apply-generic-helper op raised)))))))
-  (apply-generic-ls op args))
+  (apply-generic-helper op args))
 #+end_src
