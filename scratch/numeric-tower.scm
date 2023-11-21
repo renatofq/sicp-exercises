@@ -23,34 +23,25 @@
 ;; put/get -------------------------------------------------------------
 (define op-table '())
 
-;; (define (get op type-tags)
-;;   (assoc-ref op-table (list op type-tags)))
-
-;; (define (put op type-tags item)
-;;   (set! op-table
-;;         (assoc-set! op-table
-;;                     (list op type-tags)
-;;                     op)))
-(define op-table '())
-
 (define (get op type-tags)
-  (let ((op-alist (assoc-ref op-table op)))
-    (if op-alist
-        (assoc-ref op-alist type-tags)
-        #f)))
+  (assoc-ref op-table (list op type-tags)))
 
 (define (put op type-tags item)
-  (define (get-alist op)
-    (let ((result (assoc-ref op-table op)))
-      (if result
-          result
-          '())))
   (set! op-table
         (assoc-set! op-table
-                    op
-                    (assoc-set! (get-alist op)
-                                type-tags
-                                item))))
+                    (list op type-tags)
+                    item)))
+
+(define coercion-table '())
+
+(define (get-coercion op type-tags)
+  (assoc-ref coercion-table (cons op type-tags)))
+
+(define (put-coercion op type-tags item)
+  (set! coercion-table
+        (assoc-set! coercion-table
+                    (cons op type-tags)
+                    item)))
 
 
 ;; tagged data ---------------------------------------------------------
@@ -70,8 +61,15 @@
              datum)))
 
 ;; Numeric tower -------------------------------------------------------
+(define (apply-coercion type arg)
+  (let ((coercion (get-coercion type (type-tag arg))))
+    (if coercion
+        (coercion arg)
+        (error "No method for these types: APPLY-COERCION"
+                         (cons type (type-tag arg))))))
+
 (define (raise x)
-  (apply-generic 'raise x))
+  (apply-coercion 'raise x))
 
 (define (higher-type? t1 t2)
   (let ((t2-tower (sublist t2 '(integer rational real complex))))
@@ -98,7 +96,7 @@
             (apply proc (map contents args))
             (let ((raised (level-up args)))
               (if (equal? raised args)
-                  (error "No method for these types: "
+                  (error "No method for these types: APPLY-GENERICS"
                          (list op type-tags))
                   (apply-generic-helper op raised)))))))
   (apply-generic-helper op args))
@@ -321,18 +319,67 @@
 (define (angle z)
   (apply-generic 'angle z))
 
-;;
+;; equality package ----------------------------------------------------
+(define (install-equality-package)
+  (put 'equ?
+       '(integer integer)
+       (lambda (x y)
+         (= x y)))
+  (put 'equ?
+       '(rational rational)
+       (lambda (x y)
+         (and (= (numerator x) (numerator y))
+              (= (denominator x) (denominator y)))))
+  (put 'equ?
+       '(real real)
+       (lambda (x y)
+         (= x y)))
+  (put 'equ?
+     '(complex complex)
+     (lambda (x y)
+       (and (= (real-part x) (real-part y))
+            (= (imag-part x) (imag-part y)))))
+  'done)
+
+(define (equ? x y)
+  (apply-generic 'equ? x y))
+
+;; zero check package --------------------------------------------------
+(define (install-zero-predicate-package)
+  (put '=zero?
+       '(integer)
+       (lambda (x)
+         (= 0 x)))
+  (put '=zero?
+       '(rational)
+       (lambda (x)
+         (= 0 (numerator x))))
+  (put '=zero?
+       '(real)
+       (lambda (x)
+         (= 0.0 x)))
+  (put '=zero?
+       '(complex)
+       (lambda (x)
+         (and (= 0.0 (real-part x))
+              (= 0.0 (imag-part x)))))
+  'done)
+
+(define (=zero? x)
+  (apply-generic '=zero? x))
+
+;; raise/drop package --------------------------------------------------
 (define (install-raise-package)
-  (define (integer->rational num)
-    (make-rational num 1))
-  (define (rational->real num)
-    (make-real (/ (car num) (cdr num))))
-  (define (real->complex num)
-    (make-complex-from-real-imag num 0))
+  (define (integer->rational i)
+    (make-rational (contents i) 1))
+  (define (rational->real r)
+    (make-real (/ (numerator r) (denominator r))))
+  (define (real->complex x)
+    (make-complex-from-real-imag (contents x) 0))
   ;;
-  (put 'raise '(integer) integer->rational)
-  (put 'raise '(rational) rational->real)
-  (put 'raise '(real) real->complex))
+  (put-coercion 'raise 'integer integer->rational)
+  (put-coercion 'raise 'rational rational->real)
+  (put-coercion 'raise 'real real->complex))
 
 ;; Setup
 (install-integer-package)
@@ -341,4 +388,11 @@
 (install-rectangular-package)
 (install-polar-package)
 (install-complex-package)
+(install-equality-package)
 (install-raise-package)
+
+;; test-data
+(define i (make-integer 1))
+(define r (make-rational 1 4))
+(define x (make-real (sqrt 2)))
+(define z (make-complex-from-mag-ang (sqrt 2) 0.25))

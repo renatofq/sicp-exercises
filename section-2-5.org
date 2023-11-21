@@ -219,19 +219,26 @@ Suppose you are designing a generic arithmetic system for dealing with the tower
 ** Solution
 #+begin_src scheme
 (define (install-raise-package)
-  (define (integer->rational num)
-    (make-rational num 1))
-  (define (rational->real num)
-    (make-real (/ (car num) (cdr num))))
-  (define (real->complex num)
-    (make-complex-from-real-imag num 0))
+  (define (integer->rational i)
+    (make-rational (contents i) 1))
+  (define (rational->real r)
+    (make-real (/ (numerator r) (denominator r))))
+  (define (real->complex x)
+    (make-complex-from-real-imag (contents x) 0))
   ;;
-  (put 'raise '(integer) integer->rational)
-  (put 'raise '(rational) rational->real)
-  (put 'raise '(real) real->complex))
+  (put-coercion 'raise 'integer integer->rational)
+  (put-coercion 'raise 'rational rational->real)
+  (put-coercion 'raise 'real real->complex))
+
+(define (apply-coercion type arg)
+  (let ((coercion (get-coercion type (type-tag arg))))
+    (if coercion
+        (coercion arg)
+        (error "No method for these types: APPLY-COERCION"
+                         (cons type (type-tag arg))))))
 
 (define (raise x)
-  (apply-generic 'raise x))
+  (apply-coercion 'raise x))
 #+end_src
 
 * Exercise 2.84
