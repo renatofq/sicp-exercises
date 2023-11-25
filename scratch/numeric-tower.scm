@@ -46,30 +46,47 @@
 
 ;; tagged data ---------------------------------------------------------
 (define (attach-tag type-tag contents)
-  (cons type-tag contents))
+  (if (eq? type-tag 'scheme-number)
+      contents
+      (cons type-tag contents)))
 
 (define (type-tag datum)
-  (if (pair? datum)
-      (car datum)
-      (error "Bad tagged datum: TYPE-TAG"
-             datum)))
+  (cond ((number? datum) 'scheme-number)
+        ((pair? datum)
+         (car datum))
+        (else
+         (error "Bad tagged datum: TYPE-TAG"
+                datum))))
 
 (define (contents datum)
-  (if (pair? datum)
-      (cdr datum)
-      (error "Bad tagged datum: CONTENTS"
-             datum)))
+  (cond ((number? datum) datum)
+        ((pair? datum)
+         (cdr datum))
+        (else
+         (error "Bad tagged datum: CONTENTS"
+                datum))))
 
 ;; Numeric tower -------------------------------------------------------
 (define (apply-coercion type arg)
   (let ((coercion (get-coercion type (type-tag arg))))
     (if coercion
         (coercion arg)
-        (error "No method for these types: APPLY-COERCION"
-                         (cons type (type-tag arg))))))
+        arg)))
 
 (define (raise x)
   (apply-coercion 'raise x))
+
+(define (drop x)
+  (apply-coercion 'drop x))
+
+(define (full-drop x)
+  (if (pair? x)
+      (let ((droped (drop x)))
+        (if (and (not (eq? x droped))
+                 (equ? x (raise droped)))
+            (full-drop droped)
+            x))
+      x))
 
 (define (higher-type? t1 t2)
   (let ((t2-tower (sublist t2 '(integer rational real complex))))
@@ -93,7 +110,7 @@
     (let ((type-tags (map type-tag args)))
       (let ((proc (get op type-tags)))
         (if proc
-            (apply proc (map contents args))
+            (full-drop (apply proc (map contents args)))
             (let ((raised (level-up args)))
               (if (equal? raised args)
                   (error "No method for these types: APPLY-GENERICS"
@@ -328,8 +345,8 @@
   (put 'equ?
        '(rational rational)
        (lambda (x y)
-         (and (= (numerator x) (numerator y))
-              (= (denominator x) (denominator y)))))
+         (and (= (car x) (car y))
+              (= (cdr x) (cdr y)))))
   (put 'equ?
        '(real real)
        (lambda (x y)
@@ -376,10 +393,19 @@
     (make-real (/ (numerator r) (denominator r))))
   (define (real->complex x)
     (make-complex-from-real-imag (contents x) 0))
+  (define (rational->integer r)
+    (make-integer (numerator r)))
+  (define (real->rational x)
+    (make-rational (contents x) 1))
+  (define (complex->real z)
+    (make-real (real-part z)))
   ;;
-  (put-coercion 'raise 'integer integer->rational)
+  (put-coercion 'raise 'integer  integer->rational)
   (put-coercion 'raise 'rational rational->real)
-  (put-coercion 'raise 'real real->complex))
+  (put-coercion 'raise 'real     real->complex)
+  (put-coercion 'drop  'rational rational->integer)
+  (put-coercion 'drop  'real     real->rational)
+  (put-coercion 'drop  'complex  complex->real))
 
 ;; Setup
 (install-integer-package)
@@ -396,3 +422,8 @@
 (define r (make-rational 1 4))
 (define x (make-real (sqrt 2)))
 (define z (make-complex-from-mag-ang (sqrt 2) 0.25))
+(define z1 (make-complex-from-real-imag 1 0))
+(define z2 (make-complex-from-real-imag 2 0))
+(add z1 z2)
+
+(add z i)
