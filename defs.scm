@@ -5,6 +5,7 @@
 (define nil '())
 (define true #t)
 (define false #f)
+(define pi 3.14159)
 
 ;; Chapter 1
 (define (inc n) (+ n 1))
@@ -115,6 +116,20 @@
                                  left-tree
                                  right-tree)
                       remaining-elts))))))))
+
+;; Chapter 3
+(define (monte-carlo trials experiment)
+  (define (iter trials-remaining trials-passed)
+    (cond ((= trials-remaining 0)
+           (/ trials-passed trials))
+          ((experiment)
+           (iter (- trials-remaining 1)
+                 (+ trials-passed 1)))
+          (else
+           (iter (- trials-remaining 1)
+                 trials-passed))))
+  (iter trials 0))
+
 
 ;; test functions
 (define (display-test-fail expected actual)
