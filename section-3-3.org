@@ -72,8 +72,32 @@ $3 = (a b c d)
 $4 = (b c d)
 #+end_example
 
-*** Boxes diagram after (define z (append x y))
+*** Box-and-pointer diagram after (define z (append x y))
 file:annex/3_12-boxes-1.png
 
-*** Boxes diagram after (define w (append! x y))
+*** Box-and-pointer diagram after (define w (append! x y))
 file:annex/3_12-boxes-2.png
+
+* Exercise 3.13
+Consider the following make-cycle procedure, which uses the last-pair procedure defined in Exercise 3.12:
+
+#+begin_src scheme :eval never
+(define (make-cycle x)
+  (set-cdr! (last-pair x) x)
+  x)
+#+end_src
+
+Draw a box-and-pointer diagram that shows the structure z created by
+
+#+begin_src scheme :eval never
+(define z (make-cycle (list 'a 'b 'c)))
+#+end_src
+
+What happens if we try to compute (last-pair z)?
+
+** Solution
+*** Box-and-pointer diagram
+file:annex/3_13-boxes.png
+
+*** What happens if we try to compute (last-pair z)?
+An infinite recursion will happen
