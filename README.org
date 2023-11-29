@@ -15,3 +15,6 @@
 + [[file:section-2-3-huffman-encoding.org][Example: Huffman Encoding]]
 + [[file:section-2-4.org][Section 2.4]]
 + [[file:section-2-5.org][Section 2.5]]
++ [[file:section-3-1.org][Section 3.1]]
++ [[file:section-3-2.org][Section 3.2]]
++ [[file:section-3-3.org][Section 3.3]]
