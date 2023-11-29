@@ -101,3 +101,28 @@ file:annex/3_13-boxes.png
 
 *** What happens if we try to compute (last-pair z)?
 An infinite recursion will happen
+
+* Exercise 3.14
+The following procedure is quite useful, although obscure:
+
+#+begin_src scheme :eval never
+(define (mystery x)
+  (define (loop x y)
+    (if (null? x)
+        y
+        (let ((temp (cdr x)))
+          (set-cdr! x y)
+          (loop temp x))))
+  (loop x '()))
+#+end_src
+
+Loop uses the “temporary” variable temp to hold the old value of the cdr of x, since the set-cdr!  on the next line destroys the cdr.  Explain what mystery does in general.  Suppose v is defined by (define v (list 'a 'b 'c 'd)). Draw the box-and-pointer diagram that represents the list to which v is bound. Suppose that we now evaluate (define w (mystery v)). Draw box-and-pointer diagrams that show the structures v and w after evaluating this expression.  What would be printed as the values of v and w?
+
+** Solution
+mystery returns a list in the reversed order while changing the original list which becomes a list containing only the first of its original elements.
+
+*** Box-and-pointer diagram after (define v (list 'a 'b 'c 'd))
+file:annex/3_14-boxes-1.png
+
+*** Box-and-pointer diagram after (define w (mystery v))
+file:annex/3_14-boxes-2.png
