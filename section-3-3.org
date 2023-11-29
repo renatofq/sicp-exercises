@@ -73,10 +73,10 @@ $4 = (b c d)
 #+end_example
 
 *** Box-and-pointer diagram after (define z (append x y))
-file:annex/3_12-boxes-1.png
+[[file:annex/3_12-boxes-1.png]]
 
 *** Box-and-pointer diagram after (define w (append! x y))
-file:annex/3_12-boxes-2.png
+[[file:annex/3_12-boxes-2.png]]
 
 * Exercise 3.13
 Consider the following make-cycle procedure, which uses the last-pair procedure defined in Exercise 3.12:
@@ -97,7 +97,7 @@ What happens if we try to compute (last-pair z)?
 
 ** Solution
 *** Box-and-pointer diagram
-file:annex/3_13-boxes.png
+[[file:annex/3_13-boxes.png]]
 
 *** What happens if we try to compute (last-pair z)?
 An infinite recursion will happen
@@ -122,7 +122,7 @@ Loop uses the “temporary” variable temp to hold the old value of the cdr of 
 mystery returns a list in the reversed order while changing the original list which becomes a list containing only the first of its original elements.
 
 *** Box-and-pointer diagram after (define v (list 'a 'b 'c 'd))
-file:annex/3_14-boxes-1.png
+[[file:annex/3_14-boxes-1.png]]
 
 *** Box-and-pointer diagram after (define w (mystery v))
-file:annex/3_14-boxes-2.png
+[[file:annex/3_14-boxes-2.png]]
