@@ -190,15 +190,15 @@ Devise a correct version of the count-pairs procedure of Exercise 3.16 that retu
    x))
 
 (define a-list '(a))
+(define a-list-consed (cons a-list a-list))
 
 (test-equal 3 (count-pairs '(a b c)))
 
 ;; would return 4 in the previous exercise
-(test-equal 3 (count-pairs (cons (cons a-list a-list) '())))
+(test-equal 3 (count-pairs (cons a-list-consed '())))
 
 ;; would return 7 in the previous exercise
-(test-equal 3 (count-pairs (let ((temp (cons a-list a-list)))
-                             (cons temp temp))))
+(test-equal 3 (count-pairs (cons a-list-consed a-list-consed)))
 
 (define (last-pair x)
   (if (null? (cdr x))
