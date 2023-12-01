@@ -291,3 +291,126 @@ Redo Exercise 3.18 using an algorithm that takes only a constant amount of space
 
 (test-assert (cycle? a-list))
 #+end_src
+
+* TODO Exercise 3.20
+Draw environment diagrams to illustrate the evaluation of the sequence of expressions
+
+#+begin_example
+(define x (cons 1 2))
+(define z (cons x x))
+
+(set-car! (cdr z) 17)
+
+(car x)
+17
+#+end_example
+
+using the procedural implementation of pairs given above.  (Compare Exercise 3.11.)
+
+* Exercise 3.21
+Ben Bitdiddle decides to test the queue implementation described above.  He types in the procedures to the Lisp interpreter and proceeds to try them out:
+
+#+begin_example
+(define q1 (make-queue))
+
+(insert-queue! q1 'a)
+((a) a)
+
+(insert-queue! q1 'b)
+((a b) b)
+
+(delete-queue! q1)
+((b) b)
+
+(delete-queue! q1)
+(() b)
+#+end_example
+
+“It’s all wrong!” he complains.  “The interpreter’s response shows that the last item is inserted into the queue twice.  And when I delete both items, the second b is still there, so the queue isn’t empty, even though it’s supposed to be.”  Eva Lu Ator suggests that Ben has misunderstood what is happening.  “It’s not that the items are going into the queue twice,” she explains.  “It’s just that the standard Lisp printer doesn’t know how to make sense of the queue representation.  If you want to see the queue printed correctly, you’ll have to define your own print procedure for queues.” Explain what Eva Lu is talking about.  In particular, show why Ben’s examples produce the printed results that they do.  Define a procedure print-queue that takes a queue as input and prints the sequence of items in the queue.
+
+** Solution
+The standard printer treats pairs that have cdr pointing to another pair as list. Then, our queue structure is printed as a list with two elements whose first element is a list with all elements of the queue and the second one is the last element of the queue. As the second to last element and the rear-ptr point to the same element, it looks like duplication when printed by the standard printer, but it is not. When all elements got removed from the queue, the rear-ptr was still pointing to the last one, because delete-queue! don't touch the rear-ptr but, if we call empty-queue? it will return true and if we call insert-queue the rear-ptr will be updated accordingly.
+
+#+begin_src scheme
+(define (display-queue queue)
+  (display "<-")
+  (display (front-ptr queue))
+  (display "-<")
+  (newline))
+#+end_src
+
+* Exercise 3.22
+Instead of representing a queue as a pair of pointers, we can build a queue as a procedure with local state. The local state will consist of pointers to the beginning and the end of an ordinary list.  Thus, the make-queue procedure will have the form
+
+#+begin_src scheme :eval never
+(define (make-queue)
+  (let ((front-ptr … )
+        (rear-ptr … ))
+    ⟨definitions of internal procedures⟩
+    (define (dispatch m) …)
+    dispatch))
+#+end_src
+
+Complete the definition of make-queue and provide implementations of the queue operations using this representation.
+
+** Solution
+#+begin_src scheme
+(define (make-queue)
+  (let ((front-ptr '())
+        (rear-ptr '()))
+    (define (empty?)
+      (null? front-ptr))
+    (define (front)
+      (if (empty?)
+          (error "FRONT called with an empty queue")
+          (car front-ptr)))
+    (define (insert! item)
+      (let ((new-pair (cons item '())))
+        (if (empty?)
+            (begin
+              (set! front-ptr new-pair)
+              (set! rear-ptr new-pair))
+            (begin
+               (set-cdr! rear-ptr new-pair)
+               (set! rear-ptr new-pair)))))
+    (define (delete!)
+      (if (empty?)
+          (error "DELETE! called with an empty queue")
+          (set! front-ptr (cdr front-ptr))))
+    (define (display-queue)
+      (display "<-")
+      (display front-ptr)
+      (display "-<")
+      (newline))
+    (define (dispatch m)
+      (cond ((eq? 'empty? m) empty?)
+            ((eq? 'front m) front)
+            ((eq? 'insert! m) insert!)
+            ((eq? 'delete! m) delete!)
+            ((eq? 'display m) display-queue)
+            (else (error "Unknown request: QUEUE" m))))
+    dispatch))
+
+(define (empty-queue? queue)
+  ((queue 'empty?)))
+(define (front-queue queue)
+  ((queue 'front)))
+(define (insert-queue! queue item)
+  ((queue 'insert!) item)
+  queue)
+(define (delete-queue! queue)
+  ((queue 'delete!))
+  queue)
+(define (display-queue queue)
+  ((queue 'display)))
+
+(define q (make-queue))
+(test-assert (empty-queue? q))
+(insert-queue! q 'a)
+(insert-queue! q 'b)
+(test-equal 'a (front-queue q))
+(delete-queue! q)
+(test-equal 'b (front-queue q))
+(delete-queue! q)
+(test-assert (empty-queue? q))
+#+end_src
