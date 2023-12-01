@@ -212,3 +212,82 @@ Devise a correct version of the count-pairs procedure of Exercise 3.16 that retu
 ;; would never return
 (test-equal 3 (count-pairs (make-cycle '(a b c))))
 #+end_src
+
+* Exercise 3.18
+Write a procedure that examines a list and determines whether it contains a cycle, that is, whether a program that tried to find the end of the list by taking successive cdrs would go into an infinite loop.  Exercise 3.13 constructed such lists.
+
+** Solution
+#+begin_src scheme
+(define (element-of-set? x set)
+  (cond ((null? set) false)
+        ((eq? x (car set)) true)
+        (else (element-of-set? x (cdr set)))))
+
+(define (adjoin-set x set)
+  (cons x set))
+
+(define (cycle? x)
+  (define (cycle-helper x set-of-pairs)
+       (cond ((null? x)
+              false)
+             ((element-of-set? x set-of-pairs)
+              true)
+             (else
+              (cycle-helper (cdr x) (adjoin-set x set-of-pairs)))))
+  (cycle-helper x '()))
+
+(define (last-pair x)
+  (if (null? (cdr x))
+      x
+      (last-pair (cdr x))))
+
+(define (make-cycle x)
+  (set-cdr! (last-pair x) x)
+  x)
+
+(define a-list '(a b c))
+(test-assert (not (cycle? a-list)))
+
+;; last pair points back to the second one
+(make-cycle (cdr a-list))
+
+(test-assert (cycle? a-list))
+#+end_src
+
+* Exercise 3.19
+Redo Exercise 3.18 using an algorithm that takes only a constant amount of space.  (This requires a very clever idea.)
+
+** Solution
+#+begin_src scheme
+(define (cycle? l)
+  (define (iter slow fast)
+    (cond ((null? fast) false)
+          ((eq? slow fast) true)
+          (else
+           (let ((ahead (cdr fast)))
+             (cond ((null? ahead) false)
+                   ((eq? slow ahead) true)
+                   (else
+                    (iter (cdr slow) (cdr ahead))))))))
+  (if (null? l)
+      false
+      (iter l (cdr l))))
+
+
+(define a-list '(a b c d))
+(test-assert (not (cycle? a-list)))
+
+(define (last-pair x)
+  (if (null? (cdr x))
+      x
+      (last-pair (cdr x))))
+
+(define (make-cycle x)
+  (set-cdr! (last-pair x) x)
+  x)
+
+;; last pair points back to the second one
+(make-cycle (cdr a-list))
+
+(test-assert (cycle? a-list))
+#+end_src
