@@ -130,6 +130,42 @@
                  trials-passed))))
   (iter trials 0))
 
+;; table
+(define (assoc key records)
+  (cond ((null? records) false)
+        ((equal? key (caar records))
+         (car records))
+        (else (assoc key (cdr records)))))
+
+(define (insert! key value table)
+  (let ((record (assoc key (cdr table))))
+    (if record
+        (set-cdr! record value)
+        (set-cdr! table
+                  (cons (cons key value)
+                        (cdr table)))))
+  'ok)
+
+(define (make-table)
+  (list '*table*))
+
+(define (lookup key table)
+  (let ((record (assoc key (cdr table))))
+    (if record
+        (cdr record)
+        false)))
+
+;; memoization
+(define (memoize f)
+  (let ((table (make-table)))
+    (lambda (x)
+      (let ((previously-computed-result
+             (lookup x table)))
+        (or previously-computed-result
+            (let ((result (f x)))
+              (insert! x result table)
+              result))))))
+
 
 ;; test functions
 (define (display-test-fail expected actual)
@@ -152,4 +188,3 @@
   (if (< error
          (abs (- expected actual)))
       (display-test-fail expected actual)))
-
