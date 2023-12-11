@@ -630,13 +630,15 @@ Fill in the missing expressions to complete the following definitions of some ba
 
 * Exercise 2.34
 Evaluating a polynomial in $x$ at a given value of $x$ can be formulated as an accumulation. We evaluate the polynomial
-\[
+\begin{equation*}
 a_n x^n + a_{n-1}x^{n-1} + \cdots +a_1x + a_0
-\]
+\end{equation*}
+
 using a well-known algorithm called Horner's rule, which structures the computation as
-\[
+\begin{equation*}
 (\cdots(a_nx + a_{n-1})x + \cdots +a_1)x + a_0.
-\]
+\end{equation*}
+
 In other words, we start with $a_n$, multiply by $x$, add $a_{n-1}$, multiply by $x$, and so on, until we reach $a_0$.
 
 Fill in the following template to produce a procedure that evaluates a polynomial using Horner's rule. Assume that the coefficients of the polynomial are arranged in a sequence, from $a_0$ through
@@ -716,11 +718,14 @@ The procedure accumulate-n is similar to accumulate except that it takes as its 
 * Exercise 2.37
 Suppose we represent vectors $v=(v_i)$ as sequences of numbers, and matrices $m=(m_{ij})$ as sequences of vectors (the rows of the matrix). For example, the matrix
 
-\[\begin{pmatrix}
+\begin{equation*}
+\begin{pmatrix}
 1 & 2 & 3 & 4 \\
 4 & 5 & 6 & 6 \\
 6 & 7 & 8 & 9
-\end{pmatrix}\]
+\end{pmatrix}
+\end{equation*}
+
 
 is represented as the sequence ((1 2 3 4) (4 5 6 6) (6 7 8 9)). With this representation, we can use sequence operations to concisely express the basic matrix and vector operations. These operations (which are described in any book on matrix algebra) are the following:
 

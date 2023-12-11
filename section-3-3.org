@@ -786,18 +786,16 @@ Figure 3.27 shows a ripple-carry adder formed by stringing together n full-adder
 Let $fa\mbox{-}s\mbox{-}delay$ be the delay to update the SUM wire of the $full\mbox{-}adder$ circuit and $fa\mbox{-}c\mbox{-}delay$ be the delay to update the $C_{out}$ same circuit.  Also, let $ha\mbox{-}s\mbox{-}delay$ be the delay to update S wire of the $half\mbox{-}adder$ circuit and $ha\mbox{-}c\mbox{-}delay$ the delay to update the C wire of the same circuit.  Since the computation of each $full\mbox{-}adder$ depends on the computation of the carry-on bit of the previous $full\mbox{-}adder$, the delay needed to get the complete output, for n > 1, is:
 
 \begin{equation*}
-rca\mbox{-}delay = max(fa\mbox{-}s\mbox{-}delay, fa\mbox{-}c\mbox{-}delay) + max((n-1)*fa\mbox{-}c\mbox{-}delay, fa\mbox{-}s\mbox{-}delay)
+rca\mbox{-}delay = max(fa\mbox{-}s\mbox{-}delay, fa\mbox{-}c\mbox{-}delay) + max((n-1) fa\mbox{-}c\mbox{-}delay, fa\mbox{-}s\mbox{-}delay)
 \end{equation*}
 
 From the circuits is possible to derive the $full\mbox{-}adder$ delays in terms of $half\mbox{-}adder$ delays:
 
-\begin{equation*}
-fa\mbox{-}s\mbox{-}delay = 2*ha\mbox{-}s\mbox{-}delay
-\end{equation*}
+\begin{align*}
+fa\mbox{-}s\mbox{-}delay &= 2ha\mbox{-}s\mbox{-}delay \\
 
-\begin{equation*}
-fa\mbox{-}c\mbox{-}delay = max(ha\mbox{-}c\mbox{-}delay, ha\mbox{-}s\mbox{-}delay + ha\mbox{-}c\mbox{-}delay) + or\mbox{-}delay
-\end{equation*}
+fa\mbox{-}c\mbox{-}delay &= max(ha\mbox{-}c\mbox{-}delay, ha\mbox{-}s\mbox{-}delay + ha\mbox{-}c\mbox{-}delay) + or\mbox{-}delay
+\end{align*}
 
 Since $ha\mbox{-}c\mbox{-}delay < ha\mbox{-}s\mbox{-}delay + ha\mbox{-}c\mbox{-}delay$, then:
 
@@ -807,69 +805,47 @@ fa\mbox{-}c\mbox{-}delay = ha\mbox{-}s\mbox{-}delay + ha\mbox{-}c\mbox{-}delay +
 
 And the $half\mbox{-}adder$ delays:
 
-\begin{equation*}
-ha\mbox{-}s\mbox{-}delay = max(and\mbox{-}delay, or\mbox{-}delay + inverter\mbox{-}delay) + and\mbox{-}delay
-\end{equation*}
+\begin{align*}
+ha\mbox{-}s\mbox{-}delay &= max(and\mbox{-}delay, or\mbox{-}delay + inverter\mbox{-}delay) + and\mbox{-}delay \\
 
-\begin{equation*}
-ha\mbox{-}c\mbox{-}delay = and\mbox{-}delay
-\end{equation*}
+ha\mbox{-}c\mbox{-}delay &= and\mbox{-}delay
+\end{align*}
 
 Now is possible to show that $fa\mbox{-}s\mbox{-}delay > fa\mbox{-}c\mbox{-}delay$:
 
-\begin{equation*}
-2*ha\mbox{-}s\mbox{-}delay > ha\mbox{-}s\mbox{-}delay + ha\mbox{-}c\mbox{-}delay + or\mbox{-}delay
-\end{equation*}
+\begin{align*}
+2ha\mbox{-}s\mbox{-}delay &> ha\mbox{-}s\mbox{-}delay + ha\mbox{-}c\mbox{-}delay + or\mbox{-}delay \\
 
-\begin{equation*}
-ha\mbox{-}s\mbox{-}delay > ha\mbox{-}c\mbox{-}delay + or\mbox{-}delay
-\end{equation*}
+ha\mbox{-}s\mbox{-}delay &> ha\mbox{-}c\mbox{-}delay + or\mbox{-}delay \\
 
-\begin{equation*}
-max(and\mbox{-}delay, or\mbox{-}delay + inverter\mbox{-}delay) + and\mbox{-}delay > and\mbox{-}delay + or\mbox{-}delay
-\end{equation*}
+max(and\mbox{-}delay, or\mbox{-}delay + inverter\mbox{-}delay) + and\mbox{-}delay &> and\mbox{-}delay + or\mbox{-}delay \\
 
-\begin{equation*}
-max(and\mbox{-}delay, or\mbox{-}delay + inverter\mbox{-}delay) > or\mbox{-}delay
-\end{equation*}
+max(and\mbox{-}delay, or\mbox{-}delay + inverter\mbox{-}delay) &> or\mbox{-}delay
+\end{align*}
 
-given $inverter\mbox{-}delay > 0$.
+given $inverter\mbox{-}delay > 0$. Then, Simplify $rca\mbox{-}delay$:
 
-Simplify $rca\mbox{-}delay$:
-
-\begin{equation*}
-rca\mbox{-}delay = fa\mbox{-}s\mbox{-}delay + max((n-1)*fa\mbox{-}c\mbox{-}delay, fa\mbox{-}s\mbox{-}delay)
-\end{equation*}
+\begin{align*}
+rca\mbox{-}delay = fa\mbox{-}s\mbox{-}delay + max((n-1)fa\mbox{-}c\mbox{-}delay, fa\mbox{-}s\mbox{-}delay)
+\end{align*}
 
 After substitutions:
 
-\begin{equation*}
-fa\mbox{-}s\mbox{-}delay = 2*max(and\mbox{-}delay, or\mbox{-}delay + inverter\mbox{-}delay) + 2*and\mbox{-}delay
-\end{equation*}
-
-\begin{equation*}
-fa\mbox{-}c\mbox{-}delay = max(and\mbox{-}delay, or\mbox{-}delay + inverter\mbox{-}delay) + 2*and\mbox{-}delay + or\mbox{-}delay
-\end{equation*}
-
 \begin{align*}
-\begin{split}
-rca\mbox{-}delay & = 2*max(and\mbox{-}delay, or\mbox{-}delay + inverter\mbox{-}delay) \\
-                 & + 2*and\mbox{-}delay \\
-                 & + max((n-1)*(max(and\mbox{-}delay, or\mbox{-}delay + inverter\mbox{-}delay) + 2*and\mbox{-}delay + or\mbox{-}delay), \\
-                 & \qquad \qquad 2*max(and\mbox{-}delay, or\mbox{-}delay + inverter\mbox{-}delay) + 2*and\mbox{-}delay)
-\end{split}
+fa\mbox{-}s\mbox{-}delay =& 2max(and\mbox{-}delay, or\mbox{-}delay + inverter\mbox{-}delay) + 2and\mbox{-}delay \\
+
+fa\mbox{-}c\mbox{-}delay =& max(and\mbox{-}delay, or\mbox{-}delay + inverter\mbox{-}delay) + 2and\mbox{-}delay + or\mbox{-}delay \\
+
+rca\mbox{-}delay =& 2max(and\mbox{-}delay, or\mbox{-}delay + inverter\mbox{-}delay) + 2and\mbox{-}delay \\
+                  & + max((n-1)(max(and\mbox{-}delay, or\mbox{-}delay + inverter\mbox{-}delay) + 2and\mbox{-}delay + or\mbox{-}delay), \\
+                  & \qquad \qquad 2max(and\mbox{-}delay, or\mbox{-}delay + inverter\mbox{-}delay) + 2and\mbox{-}delay)
 \end{align*}
 
-Assuming $(n-1)*fa\mbox{-}c\mbox{-}delay > fa\mbox{-}s\mbox{-}delay$:
+Assuming $(n-1)fa\mbox{-}c\mbox{-}delay > fa\mbox{-}s\mbox{-}delay$:
 
-\begin{equation*}
-\begin{split}
-rca\mbox{-}delay & = 2*max(and\mbox{-}delay, or\mbox{-}delay + inverter\mbox{-}delay) \\
-                 & + 2*and\mbox{-}delay \\
-                 & + (n-1)(max(and\mbox{-}delay, or\mbox{-}delay + inverter\mbox{-}delay) + 2*and\mbox{-}delay + or\mbox{-}delay)
-\end{split}
-\end{equation*}
+\begin{align*}
+rca\mbox{-}delay =& 2 max(and\mbox{-}delay, or\mbox{-}delay + inverter\mbox{-}delay) + 2 and\mbox{-}delay \\
+                 & + (n-1)(max(and\mbox{-}delay, or\mbox{-}delay + inverter\mbox{-}delay) + 2 and\mbox{-}delay + or\mbox{-}delay) \\
 
-\begin{equation*}
-rca\mbox{-}delay = (n+1)(max(and\mbox{-}delay, or\mbox{-}delay + inverter\mbox{-}delay) + 2*and\mbox{-}delay) + (n-1)or\mbox{-}delay
-\end{equation*}
+rca\mbox{-}delay =& (n+1)(max(and\mbox{-}delay, or\mbox{-}delay + inverter\mbox{-}delay) + 2and\mbox{-}delay) + (n-1)or\mbox{-}delay
+\end{align*}
