@@ -283,10 +283,10 @@ Pair structure:
 #+end_example
 
 Box-and-Pointer representation:
-[[file:annex/2_24-boxes.png]]
+[[file:annex/2_24-boxes.svg]]
 
 Tree representation:
-#+INCLUDE: "annex/2_24-tree-graph.dot" src dot :file annex/2_24-tree-graph.png
+#+INCLUDE: "annex/2_24-tree-graph.dot" src dot :file annex/2_24-tree-graph.svg :cmdline -Tsvg
 
 * Exercise 2.25
 Give combinations of cars and cdrs that will pick 7 from each of the following lists:

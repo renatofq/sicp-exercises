@@ -30,10 +30,10 @@ Show the environment structures created by evaluating (factorial 6) using each v
 
 ** Solution
 *** Recursive
-[[file:annex/3_9-recursive.png]]
+[[file:annex/3_9-1.svg]]
 
 *** Iterative
-[[file:annex/3_9-iterative.png]]
+[[file:annex/3_9-2.svg]]
 
 * TODO Exercise 3.10
 In the make-withdraw procedure, the local variable balance is created as a parameter of make-withdraw.  We could also create the local state variable explicitly, using let, as follows:

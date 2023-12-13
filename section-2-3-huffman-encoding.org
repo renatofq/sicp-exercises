@@ -22,7 +22,7 @@ Use the decode procedure to decode the message, and give the result.
 ** Solution
 Tree graph:
 
-#+INCLUDE: "annex/2_68-tree-graph.dot" src dot :file annex/2_68-tree-graph.png
+#+INCLUDE: "annex/2_68-tree-graph.dot" src dot :file annex/2_68-tree-graph.svg :cmdline -Tsvg
 
 Decoding result:
 #+begin_example

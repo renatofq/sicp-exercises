@@ -73,10 +73,10 @@ $4 = (b c d)
 #+end_example
 
 *** Box-and-pointer diagram after (define z (append x y))
-[[file:annex/3_12-boxes-1.png]]
+[[file:annex/3_12-boxes-1.svg]]
 
 *** Box-and-pointer diagram after (define w (append! x y))
-[[file:annex/3_12-boxes-2.png]]
+[[file:annex/3_12-boxes-2.svg]]
 
 * Exercise 3.13
 Consider the following make-cycle procedure, which uses the last-pair procedure defined in Exercise 3.12:
@@ -97,7 +97,7 @@ What happens if we try to compute (last-pair z)?
 
 ** Solution
 *** Box-and-pointer diagram
-[[file:annex/3_13-boxes.png]]
+[[file:annex/3_13-boxes.svg]]
 
 *** What happens if we try to compute (last-pair z)?
 An infinite recursion will happen
@@ -122,18 +122,18 @@ Loop uses the “temporary” variable temp to hold the old value of the cdr of 
 mystery returns a list in the reversed order while changing the original list which becomes a list containing only the first of its original elements.
 
 *** Box-and-pointer diagram after (define v (list 'a 'b 'c 'd))
-[[file:annex/3_14-boxes-1.png]]
+[[file:annex/3_14-boxes-1.svg]]
 
 *** Box-and-pointer diagram after (define w (mystery v))
-[[file:annex/3_14-boxes-2.png]]
+[[file:annex/3_14-boxes-2.svg]]
 
 * Exercise 3.15
 Draw box-and-pointer diagrams to explain the effect of set-to-wow! on the structures z1 and z2 above.
 
 ** Solution
-[[file:annex/3_15-boxes-1.png]]
+[[file:annex/3_15-boxes-1.svg]]
 
-[[file:annex/3_15-boxes-2.png]]
+[[file:annex/3_15-boxes-2.svg]]
 
 * Exercise 3.16
 Ben Bitdiddle decides to write a procedure to count the number of pairs in any list structure.  “It’s easy,” he reasons.  “The number of pairs in any structure is the number in the car plus the number in the cdr plus one more to count the current pair.”  So Ben writes the following procedure:
@@ -151,16 +151,16 @@ Show that this procedure is not correct.  In particular, draw box-and-pointer di
 
 ** Solution
 *** Returns 3
-[[file:annex/3_16-boxes-1.png]]
+[[file:annex/3_16-boxes-1.svg]]
 
 *** Returns 4
-[[file:annex/3_16-boxes-2.png]]
+[[file:annex/3_16-boxes-2.svg]]
 
 *** Returns 7
-[[file:annex/3_16-boxes-3.png]]
+[[file:annex/3_16-boxes-3.svg]]
 
 *** Never returns
-[[file:annex/3_16-boxes-4.png]]
+[[file:annex/3_16-boxes-4.svg]]
 
 * Exercise 3.17
 Devise a correct version of the count-pairs procedure of Exercise 3.16 that returns the number of distinct pairs in any structure.  (Hint: Traverse the structure, maintaining an auxiliary data structure that is used to keep track of which pairs have already been counted.)
@@ -726,7 +726,7 @@ Draw an environment diagram to analyze the computation of (memo-fib 3). Explain 
 ** Solution
 Environment Diagram:
 
-[[file:annex/3_27.png]]
+[[file:annex/3_27.svg]]
 
 Simply defining memo-fib to be (memoize fib) wouldn't get the expected result though, since it would memoize only the final result and not the partial results.
 

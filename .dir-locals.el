@@ -4,6 +4,7 @@
               (org-export-with-toc . nil)
               ;; (org-export-with-todo-keywords . nil)
               (org-export-with-section-numbers . nil)
+              (org-html-head . "<style type=\"text/css\">.org-svg { max-width: 100%; }</style>")
               (org-global-properties . ((header-args . ":results output")))
               (eval . (add-hook 'geiser-repl-startup-hook
                                 (lambda ()
