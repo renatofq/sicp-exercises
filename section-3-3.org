@@ -963,7 +963,7 @@ At some time during evaluation of the set-value!, the following expression from 
 Draw an environment diagram showing the environment in which the above expression is evaluated.
 
 
-* Exercise 3.37:
+* Exercise 3.37
 The celsius-fahrenheit-converter procedure is cumbersome when compared with a more expression-oriented style of definition, such as
 
 #+begin_src scheme :eval never
