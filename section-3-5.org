@@ -1,0 +1,94 @@
+#+TITLE: 3.5 Exercises
+
+* Exercise 3.50
+Complete the following definition, which generalizes stream-map to allow procedures that take multiple arguments, analogous to map in 2.2.1,  Footnote 78.
+
+#+begin_src scheme :eval never
+(define (stream-map proc . argstreams)
+  (if (<??> (car argstreams))
+      the-empty-stream
+      (<??>
+       (apply proc (map <??> argstreams))
+       (apply stream-map
+              (cons proc
+                    (map <??>
+                         argstreams))))))
+#+end_src
+
+** Solution
+#+begin_src scheme
+(define (stream-map proc . argstreams)
+  (if (stream-null? (car argstreams))
+      the-empty-stream
+      (cons-stream
+       (apply proc (map car-stream argstreams))
+       (apply stream-map
+              (cons proc
+                    (map cdr-stream
+                         argstreams))))))
+#+end_src
+
+* Exercise 3.51
+In order to take a closer look at delayed evaluation, we will use the following procedure, which simply returns its argument after printing it:
+
+#+begin_src scheme :eval never
+(define (show x)
+  (display-line x)
+  x)
+#+end_src
+
+What does the interpreter print in response to evaluating each expression in the following sequence?
+
+#+begin_src scheme
+(define x
+  (stream-map
+   show
+   (stream-enumerate-interval 0 10)))
+
+(stream-ref x 5)
+(stream-ref x 7)
+#+end_src
+
+** Solution
+At x definition the interpreter prints 0, since the car of the stream is already defined, and there's no stream comprehension.  At (stream-ref x 5) it prints the numbers 1 to 5 and returns 5.  0 is not printed because the value is already evaluated and is not evaluated again.  (stream-ref x 7) it prints 6 and 7 and returns 7.  Again the previously evaluated elements of the stream don't get evaluated anew.
+
+* Exercise 3.52
+Consider the sequence of expressions
+
+#+begin_src scheme :eval never
+(define sum 0)
+
+(define (accum x)
+  (set! sum (+ x sum))
+  sum)
+
+(define seq
+  (stream-map
+   accum
+   (stream-enumerate-interval 1 20)))
+
+(define y (stream-filter even? seq))
+
+(define z
+  (stream-filter
+   (lambda (x)
+     (= (remainder x 5) 0)) seq))
+
+(stream-ref y 7)
+(display-stream z)
+#+end_src
+
+What is the value of sum after each of the above expressions is evaluated?  What is the printed response to evaluating the stream-ref and display-stream expressions?  Would these responses differ if we had implemented (delay ⟨exp⟩) simply as (lambda () ⟨exp⟩) without using the optimization provided by memo-proc?  Explain.
+
+** Solution
+After (define seq ...) the value of sum will 1 because stream-map will evaluate stream-car of stream-enumerate-interval immediately.  The nth element of seq is the sum of its predecessors.
+
+After (define y ...), stream-filter will evaluate seq until it finds an value that satisfies the predicate even?, and the first even value of seq is 6, so sum will be 6.
+
+After (define z ...) stream-filter will evaluate seq until it finds an value that is divisible by 5, which is 10, making the value of sum 10.
+
+When the interpreter evaluates (stream-ref y 7), it will evaluate seq until it finds the 8th, because stream-ref indexes from 0, even value of seq which is 136.
+
+(display-stream z) will force the evaluation of seq to the end, making the value of sum 210, and will print the sequence 10, 15, 45, 55, 105, 120, 190, 210.
+
+Without memoization the elements of seq would be re-added producing different values and seq would be unstable, producing different values for the nth value depending on the historic of usage.
