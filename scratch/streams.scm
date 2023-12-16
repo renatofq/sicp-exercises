@@ -77,24 +77,83 @@
                          argstreams))))))
 
 
-(define sum 0)
 
-(define (accum x)
-  (set! sum (+ x sum))
-  sum)
+;; (define sum 0)
 
-(define seq
-  (stream-map
-   accum
-   (stream-enumerate-interval 1 20)))
+;; (define (accum x)
+;;   (set! sum (+ x sum))
+;;   sum)
 
-(define y (stream-filter even? seq))
+;; (define seq
+;;   (stream-map
+;;    accum
+;;    (stream-enumerate-interval 1 20)))
 
-(define z
-  (stream-filter
-   (lambda (x)
-     (= (remainder x 5) 0)) seq))
+;; (define y (stream-filter even? seq))
 
-(stream-ref y 7)
+;; (define z
+;;   (stream-filter
+;;    (lambda (x)
+;;      (= (remainder x 5) 0)) seq))
 
-(display-stream z)
+;; (stream-ref y 7)
+
+;; (display-stream z)
+
+(define (inverse predicate)
+  (lambda (. args)
+    (not (apply predicate args))))
+
+(define (divisible? x y)
+  (= (remainder x y) 0))
+
+
+(define (integers-starting-from n)
+  (cons-stream n (integers-starting-from (+ n 1))))
+
+(define (sieve pred stream)
+  (cons-stream (stream-car stream)
+               (sieve pred
+                      (stream-filter
+                       (lambda (x)
+                         (pred x (stream-car stream)))
+                       (stream-cdr stream)))))
+
+(define primes (sieve (inverse divisible?)
+                      (integers-starting-from 2)))
+
+
+(define ones (cons-stream 1 ones))
+
+(define (add-streams s1 s2)
+  (stream-map + s1 s2))
+
+(define integers (cons-stream 1 (add-streams ones integers)))
+
+(define fibs
+  (cons-stream
+   0
+   (cons-stream
+    1 (add-streams
+       (stream-cdr fibs) fibs))))
+
+
+(define primes
+  (cons-stream
+   2 (stream-filter
+      prime? (integers-starting-from 3))))
+
+(define (prime? n)
+  (define (iter ps)
+    (cond ((> (square (stream-car ps)) n) true)
+          ((divisible? n (stream-car ps)) false)
+          (else (iter (stream-cdr ps)))))
+  (iter primes))
+
+(define s (cons-stream 1 (add-streams s s)))
+
+(define (stream-take s n)
+  (if (= n 0)
+      '()
+      (cons (stream-car s)
+            (stream-take (stream-cdr s) (dec n)))))

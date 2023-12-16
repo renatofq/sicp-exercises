@@ -92,3 +92,61 @@ When the interpreter evaluates (stream-ref y 7), it will evaluate seq until it f
 (display-stream z) will force the evaluation of seq to the end, making the value of sum 210, and will print the sequence 10, 15, 45, 55, 105, 120, 190, 210.
 
 Without memoization the elements of seq would be re-added producing different values and seq would be unstable, producing different values for the nth value depending on the historic of usage.
+
+* Exercise 3.53
+Without running the program, describe the elements of the stream defined by
+
+#+begin_src scheme :eval never
+(define s (cons-stream 1 (add-streams s s)))
+#+end_src
+
+** Solution
+This sequence is the sequence of powers of two described by $2^n$ with $n$ starting from 0.
+
+* Exercise 3.54
+Define a procedure mul-streams, analogous to add-streams, that produces the elementwise product of its two input streams.  Use this together with the stream of integers to complete the following definition of the stream whose $n^{th}$ element (counting from 0) is $n + 1$ factorial:
+
+#+begin_src scheme :eval never
+(define factorials
+  (cons-stream 1 (mul-streams <??> <??>)))
+#+end_src
+
+** Solution
+#+begin_src scheme
+(define (integers-starting-from n)
+  (cons-stream n (integers-starting-from (+ n 1))))
+
+(define (mul-streams s0 s1)
+  (stream-map * s0 s1))
+
+(define factorials
+  (cons-stream 1 (mul-streams (integers-starting-from 2)
+                              factorials)))
+
+(test-equal 120 (stream-ref factorials 4))
+#+end_src
+
+* Exercise 3.55
+Define a procedure partial-sums that takes as argument a stream $S$ and returns the stream whose elements are $S_0, S_0 + S_1, S_0 + S_1 + S_2, \cdots$.  For example, (partial-sums integers) should be the stream $1, 3, 6, 10, 15, \cdots$.
+
+** Solution
+#+begin_src scheme
+;; from the book
+(define (integers-starting-from n)
+  (cons-stream
+   n (integers-starting-from (+ n 1))))
+(define integers (integers-starting-from 1))
+
+(define (add-streams s1 s2)
+  (stream-map + s1 s2))
+
+;; actual solution
+(define (partial-sum s)
+  (cons-stream
+   (stream-car s)
+   (add-streams (stream-cdr s) (partial-sum s))))
+
+(test-equal
+    '(1 3 6 10 15)
+  (stream-take (partial-sum integers) 5))
+#+end_src
