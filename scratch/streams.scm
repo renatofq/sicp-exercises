@@ -1,3 +1,11 @@
+;; (define-syntax delay
+;;   (syntax-rules ()
+;;     ((delay exp)
+;;      (lambda () exp))))
+
+;; (define (force delayed)
+;;   (delayed))
+
 (define-syntax cons-stream
   (syntax-rules ()
     ((cons-stream x y)
@@ -76,7 +84,11 @@
                     (map stream-cdr
                          argstreams))))))
 
-
+(define (stream-take s n)
+  (if (= n 0)
+      '()
+      (cons (stream-car s)
+            (stream-take (stream-cdr s) (- n 1)))))
 
 ;; (define sum 0)
 
@@ -100,27 +112,20 @@
 
 ;; (display-stream z)
 
-(define (inverse predicate)
-  (lambda (. args)
-    (not (apply predicate args))))
-
 (define (divisible? x y)
   (= (remainder x y) 0))
-
 
 (define (integers-starting-from n)
   (cons-stream n (integers-starting-from (+ n 1))))
 
-(define (sieve pred stream)
+(define (sieve stream)
   (cons-stream (stream-car stream)
-               (sieve pred
-                      (stream-filter
+               (sieve (stream-filter
                        (lambda (x)
-                         (pred x (stream-car stream)))
+                         (not (divisible? x (stream-car stream))))
                        (stream-cdr stream)))))
 
-(define primes (sieve (inverse divisible?)
-                      (integers-starting-from 2)))
+(define primes (sieve (integers-starting-from 2)))
 
 
 (define ones (cons-stream 1 ones))
@@ -145,15 +150,84 @@
 
 (define (prime? n)
   (define (iter ps)
-    (cond ((> (square (stream-car ps)) n) true)
-          ((divisible? n (stream-car ps)) false)
+    (cond ((> (square (stream-car ps)) n) #t)
+          ((divisible? n (stream-car ps)) #f)
           (else (iter (stream-cdr ps)))))
   (iter primes))
 
-(define s (cons-stream 1 (add-streams s s)))
 
-(define (stream-take s n)
-  (if (= n 0)
-      '()
-      (cons (stream-car s)
-            (stream-take (stream-cdr s) (dec n)))))
+;;; srqt
+(define sqrt-improve
+  (make-counted
+   (lambda (guess x)
+     (average guess (/ x guess)))))
+
+(define (sqrt-stream x)
+  (cons-stream
+   1.0
+   (stream-map (lambda (guess)
+                 (sqrt-improve guess x))
+               (sqrt-stream x))))
+
+(define (sqrt-stream x)
+  (define guesses
+     (cons-stream
+      1.0
+      (stream-map (lambda (guess)
+                    (sqrt-improve guess x))
+                  guesses)))
+  guesses)
+
+;; stream of pairs
+(define (interleave s1 s2)
+  (if (stream-null? s1)
+      s2
+      (cons-stream
+       (stream-car s1)
+       (interleave s2 (stream-cdr s1)))))
+
+(define (pairs s t)
+  (cons-stream
+   (list (stream-car s) (stream-car t))
+   (interleave
+    (stream-map (lambda (x)
+                  (list (stream-car s) x))
+                (stream-cdr t))
+    (pairs (stream-cdr s) (stream-cdr t)))))
+
+(define int-pairs (pairs integers integers))
+
+
+
+(define (cart-product s t)
+  (cons-stream
+   (list (stream-car s) (stream-car t))
+   (interleave
+    (interleave
+     (stream-map (lambda (x)
+                   (list (stream-car s) x))
+                 (stream-cdr t))
+     (stream-map (lambda (x)
+                   (list x (stream-car t)))
+                 (stream-cdr s)))
+    (cart-product (stream-cdr s) (stream-cdr t)))))
+
+(define (triplets s t u)
+  (cons-stream
+   (list (stream-car s) (stream-car t) (stream-car u))
+   (interleave
+    (interleave
+     (stream-map (lambda (pair) (cons (stream-car s) pair))
+                 (stream-map (lambda (x) (list (stream-car t) x))
+                             (stream-cdr u)))
+     (stream-map (lambda (pair) (cons (stream-car s) pair))
+                 (pairs (stream-cdr t) (stream-cdr u))))
+    (triplets (stream-cdr s) (stream-cdr t) (stream-cdr u)))))
+
+(define pythagorean-triplets
+  (stream-filter (lambda (triplet)
+                   (let ((a (car   triplet))
+                         (b (cadr  triplet))
+                         (c (caddr triplet)))
+                     (= (+ (* a a) (* b b)) (* c c))))
+   (triplets integers integers integers)))

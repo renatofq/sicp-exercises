@@ -250,6 +250,22 @@
       (cons (stream-car s)
             (stream-take (stream-cdr s) (dec n)))))
 
+;;; Other functions
+(define (make-counted f)
+  (let ((count 0))
+    (lambda (. args)
+      (cond ((eq? (car args) 'how-many-calls?)
+             count)
+            ((eq? (car args) 'reset-count)
+              (set! count 0))
+            (else
+             (begin (set! count (+ count 1))
+                    (apply f args)))))))
+
+(define (inverse predicate)
+  (lambda (. args)
+    (not (apply predicate args))))
+
 ;;;; Test Functions
 (define (display-test-fail expected actual)
   (display "fail! expected: ")
