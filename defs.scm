@@ -244,11 +244,18 @@
                pred
                (stream-cdr stream)))))
 
-(define (stream-take s n)
+(define (stream-take n s)
   (if (= n 0)
       '()
       (cons (stream-car s)
-            (stream-take (stream-cdr s) (dec n)))))
+            (stream-take (dec n) (stream-cdr s)))))
+
+(define ones (cons-stream 1 ones))
+
+(define (add-streams s1 s2)
+  (stream-map + s1 s2))
+
+(define integers (cons-stream 1 (add-streams ones integers)))
 
 ;;; Other functions
 (define (make-counted f)
@@ -257,7 +264,7 @@
       (cond ((eq? (car args) 'how-many-calls?)
              count)
             ((eq? (car args) 'reset-count)
-              (set! count 0))
+             (set! count 0))
             (else
              (begin (set! count (+ count 1))
                     (apply f args)))))))
