@@ -823,3 +823,54 @@ Combining these equations shows that the state of the circuit (summarized by $v_
 The signal-flow diagram representing this system of differential equations is shown in Figure 3.37.
 
 Write a procedure RLC that takes as arguments the parameters $R$, $L$, and $C$ of the circuit and the time increment $dt$.  In a manner similar to that of the $RC$ procedure of Exercise 3.73, RLC should produce a procedure that takes the initial values of the state variables, $v_{C_0}$ and $i_{L_0}$, and produces a pair (using cons) of the streams of states $v_C$ and $i_L$.  Using RLC, generate the pair of streams that models the behavior of a series RLC circuit with $R=1$ ohm, $C=0.2$ farad, $L=1$ henry, $dt = 0.1$ second, and initial values $i_{L_0}=0$ amps and $v_{C_0}=10$ volts.
+
+
+* Exercise 3.81
+Exercise 3.6 discussed generalizing the random-number generator to allow one to reset the random-number sequence so as to produce repeatable sequences of “random” numbers.  Produce a stream formulation of this same generator that operates on an input stream of requests to generate a new random number or to reset the sequence to a specified value and that produces the desired stream of random numbers.  Don’t use assignment in your solution.
+
+** Solution
+#+begin_src scheme
+;; realy bad, lazy as hell, RNG
+(define random-init 71)
+(define (rand-update x)
+  (* 37 x))
+
+(define (list->stream lst)
+  (if (null? lst)
+      the-empty-stream
+      (cons-stream (car lst)
+                   (list->stream (cdr lst)))))
+
+;; not sure if this function can be should be called fold
+(define (stream-fold op value stream)
+  (if (stream-null? stream)
+      value
+      (let ((new-value (op value (stream-car stream))))
+        (cons-stream
+         new-value
+         (stream-fold
+          op
+          new-value
+          (stream-cdr stream))))))
+
+
+(define actions '(reset generate generate generate generate))
+
+(define random-numbers
+  (stream-fold
+   (lambda (last-number action)
+     (cond ((eq? 'generate action)
+            (rand-update last-number))
+           ((eq? 'reset action)
+            (rand-update random-init))
+           (else (error "Invalid action for rand" action))))
+   random-init
+   (list->stream actions)))
+
+(test-equal (stream-take 5 random-numbers)
+            (stream-take 5 random-numbers))
+#+end_src
+
+
+* TODO Exercise 3.82
+Redo Exercise 3.5 on Monte Carlo integration in terms of streams.  The stream version of estimate-integral will not have an argument telling how many trials to perform.  Instead, it will produce a stream of estimates based on successively more trials.
