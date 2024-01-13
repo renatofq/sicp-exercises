@@ -872,5 +872,87 @@ Exercise 3.6 discussed generalizing the random-number generator to allow one to 
 #+end_src
 
 
-* TODO Exercise 3.82
+* Exercise 3.82
 Redo Exercise 3.5 on Monte Carlo integration in terms of streams.  The stream version of estimate-integral will not have an argument telling how many trials to perform.  Instead, it will produce a stream of estimates based on successively more trials.
+
+** Solution
+#+begin_src scheme
+;; random numbers
+(define random-init 71)
+(define (rand-update x)
+  (random 1.0 (seed->random-state x)))
+
+(define rand
+  (let ((x random-init))
+    (lambda ()
+      (set! x (rand-update x))
+      x)))
+
+(define random-numbers
+  (cons-stream random-init
+               (stream-map rand-update
+                           random-numbers)))
+
+;; utility
+(define (map-successive-pairs f s)
+  (cons-stream
+   (f (stream-car s)
+      (stream-car (stream-cdr s)))
+   (map-successive-pairs
+    f (stream-cdr (stream-cdr s)))))
+
+;; monte-carlo
+(define (monte-carlo experiment-stream
+                     passed
+                     failed)
+  (define (next passed failed)
+    (cons-stream
+     (/ passed (+ passed failed))
+     (monte-carlo
+      (stream-cdr experiment-stream)
+      passed
+      failed)))
+  (if (stream-car experiment-stream)
+      (next (+ passed 1) failed)
+      (next passed (+ failed 1))))
+
+;; integration
+(define (ranged x low high)
+  (+ low (* x (- high low))))
+
+(define (rectangle-area x1 y1 x2 y2)
+  (* (- x2 x1)
+     (- y2 y1)))
+
+(define (integral-experiments x1 y1 x2 y2 test)
+  (map-successive-pairs
+   (lambda (x y)
+     (test (ranged x x1 x2) (ranged y y1 y2)))
+   random-numbers))
+
+(define (integral-approximations x1 y1 x2 y2 test)
+  (let ((area (rectangle-area x1 y1 x2 y2)))
+    (stream-map
+     (lambda (result) (* result area))
+     (monte-carlo (integral-experiments x1 y1 x2 y2 test) 0 0))))
+
+;; circle specific
+(define (make-circle-test center-x center-y radius)
+  (lambda (x y)
+    (> (square radius)
+       (+ (square (- x center-x))
+          (square (- y center-y))))))
+
+;; Tests
+(define x 5.0)
+(define y 7.0)
+(define r 3.0)
+(define expected-circle-area (* pi (square r)))
+(define estimated-circle-area
+  (stream-ref
+   (integral-approximations (- x r) (- y r) (+ x r) (+ y r)
+                            (make-circle-test x y r))
+   10000))
+
+(test-approximate expected-circle-area estimated-circle-area 0.1)
+#+end_src

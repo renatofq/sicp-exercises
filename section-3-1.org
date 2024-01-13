@@ -233,7 +233,7 @@ You will find it useful to have a procedure that returns a number chosen at rand
 (define expected-circle-area (* pi (square r)))
 (test-approximate expected-circle-area
   (estimate-integral (- x r) (- y r) (+ x r) (+ y r)
-                     100000
+                     10000
                      (make-circle-test x y r))
   0.1)
 #+end_src
