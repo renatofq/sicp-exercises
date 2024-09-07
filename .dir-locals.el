@@ -6,9 +6,9 @@
                                 "defs.scm"
                                 (if (stringp dir) dir (car dir)))))
                (lambda () (geiser-load-file full-path)))))))
- (org-mode . ((mode . flyspell)
-              (mode . olivetti)
-              (ispell-local-dictionary . "american")
+ (org-mode . ((mode . olivetti)
+              (jinx-languages . "en_US")
+              (jinx-mode . t)
               (org-export-with-toc . nil)
               (org-export-with-section-numbers . nil)
               (org-html-head . "<style type=\"text/css\">.org-svg { max-width: 100%; }</style>")
