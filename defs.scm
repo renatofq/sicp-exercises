@@ -46,6 +46,15 @@
   (newline))
 
 ;;;; Chapter 2
+;; intervals
+(define (make-interval a b) (cons a b))
+(define (lower-bound interval)
+  (car interval))
+
+(define (upper-bound interval)
+  (cdr interval))
+
+;; high order functions
 (define (accumulate op initial sequence)
   (if (null? sequence)
       initial
